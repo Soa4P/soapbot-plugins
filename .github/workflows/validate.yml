@@ -1,0 +1,19 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # No dependencies on purpose: the validator is stdlib-only so this job cannot fail
+      # because a package index was slow. A red badge here must mean the index is wrong.
+      - name: Cross-file consistency
+        run: python scripts/validate_index.py
