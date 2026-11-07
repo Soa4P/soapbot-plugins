@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "note": "Plugins that are no longer maintained. They stay listed so an operator who already installed one can find out why it stopped receiving updates; they are not offered for new installs.",
+  "archived": [
+    {
+      "name": "quote-card",
+      "last_version": "0.9.3",
+      "archived_at": "2026-08-19",
+      "reason": "上游图片接口已下线，作者不再维护。已安装的实例仍可运行，但不会再收到更新。"
+    }
+  ]
+}

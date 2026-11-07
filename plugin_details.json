@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "note": "Long-form descriptions, keyed by plugin name. Kept separate from plugins.json so the file soapbot fetches on every page load stays small.",
+  "details": {
+    "weather": {
+      "summary": "查询城市天气与未来三天预报。",
+      "description": "调用公开气象接口，按城市名或经纬度查询当前天气与三天预报。结果缓存十分钟，避免同一群反复查询打满上游配额。",
+      "capabilities": ["command", "http"],
+      "requires": [],
+      "readme": "packages/weather/README.md"
+    },
+    "rss-digest": {
+      "summary": "定时抓取 RSS 并汇总推送。",
+      "description": "按 cron 表达式抓取配置里的订阅源，用关键词白名单过滤，把命中条目合并成一条消息。单次抓取有并发上限与超时，失败只跳过该源，不影响其余。",
+      "capabilities": ["command", "cron", "http", "send"],
+      "requires": [],
+      "readme": "packages/rss-digest/README.md"
+    },
+    "group-guard": {
+      "summary": "群管理辅助。",
+      "description": "关键词禁言、入群欢迎、重复消息折叠。禁言通过 send 能力下发，重复消息检测在内存里维护滑动窗口，重启后清空。",
+      "capabilities": ["command", "session", "send", "storage"],
+      "requires": [],
+      "readme": "packages/group-guard/README.md"
+    },
+    "kb-sync": {
+      "summary": "本地 Markdown 增量同步进知识库。",
+      "description": "扫描配置目录下的 Markdown 文件，按修改时间判断是否需要重新切分与索引。删除本地文件不会删除已入库的条目，需要手动清理——这是刻意的，避免误删。",
+      "capabilities": ["command", "kb_read", "storage"],
+      "requires": [],
+      "readme": "packages/kb-sync/README.md"
+    }
+  }
+}

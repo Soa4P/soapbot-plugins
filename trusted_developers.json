@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "note": "Authors whose packages have been reviewed at least once. This is a *display* hint: soapbot shows it next to a plugin so an operator knows the name has been seen before. It grants nothing — approval is still per-plugin, per-capability, per-install, and a listed author can publish a version that is blocked the same day.",
+  "developers": [
+    {
+      "handle": "Soa4P",
+      "display_name": "soapbot maintainer",
+      "since": "2026-01-01",
+      "plugins": ["weather", "rss-digest", "group-guard", "kb-sync"]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "note": "Versions that must not be installed. This file can only ADD blocks: soapbot ships its own list inside the package and merges this one on top, so emptying this file does not unblock anything a release decided to block.",
+  "blocked_versions": [
+    {
+      "name": "group-guard",
+      "version": "1.4.2",
+      "reason": "该版本把群成员 QQ 号写入未加密的本地日志，已在 1.5.0 修复。"
+    },
+    {
+      "name": "rss-digest",
+      "version": "0.3.0",
+      "reason": "该版本在抓取失败时无限重试，会打满目标站点。"
+    }
+  ]
+}
