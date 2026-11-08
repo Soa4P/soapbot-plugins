@@ -28,7 +28,9 @@ concurrency:
 jobs:
   review:
     if: github.event.pull_request.draft == false
-    timeout-minutes: 15
+    # 25: a large diff, one slow model round-trip and the comment call all fit, while a
+    # hung job still stops well before GitHub's six-hour default.
+    timeout-minutes: 25
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -76,13 +78,16 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
           VERDICT: ${{ steps.review.outputs.verdict }}
         run: |
+          # One colour per verdict. Identical blue labels are indistinguishable at a
+          # glance, which is the only thing a label is for; `--force` repaints any label
+          # left behind by an older run of this workflow.
           case "$VERDICT" in
-            safe) label="ai:safe" ;;
-            malicious) label="ai:malicious" ;;
-            *) label="ai:needs-review" ;;
+            safe)      label="ai:safe";         color="0E8A16" ;;
+            malicious) label="ai:malicious";    color="B60205" ;;
+            *)         label="ai:needs-review"; color="FBCA04" ;;
           esac
           gh label create "$label" --repo "$GITHUB_REPOSITORY" \
-            --color BFD4F2 --description "AI review verdict" --force >/dev/null 2>&1 || true
+            --color "$color" --description "AI review verdict" --force >/dev/null 2>&1 || true
           gh pr edit "$PR" --repo "$GITHUB_REPOSITORY" --add-label "$label"
 
       - name: Enable auto-merge for description-only changes
