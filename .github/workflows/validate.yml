@@ -17,3 +17,25 @@ jobs:
       # because a package index was slow. A red badge here must mean the index is wrong.
       - name: Cross-file consistency
         run: python scripts/validate_index.py
+
+  code:
+    # `index` proves the files agree with each other. This proves the *change* is safe:
+    # rewriting a published digest, pointing `download` at another repository, or
+    # deleting a block entry all leave a perfectly consistent index. Only a comparison
+    # against the base commit can see them.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # the base commit must be present, or the change rules are skipped
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Same constraint as `index`: stdlib only, so a red badge means the index is wrong.
+      - name: Rule self-test
+        run: python scripts/check_index_integrity.py --self-test
+      - name: Index change integrity
+        env:
+          # pull_request carries base.sha; a push to main carries before.
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: python scripts/check_index_integrity.py --base "$BASE_SHA"
