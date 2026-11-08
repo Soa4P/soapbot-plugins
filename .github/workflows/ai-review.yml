@@ -1,0 +1,102 @@
+name: ai-review
+
+# `pull_request_target` is the only trigger that gives a fork PR access to a secret, and
+# it is also the one that can hand that secret to attacker-controlled code. Two rules
+# follow, and neither is cosmetic:
+#
+#   1. checkout is pinned to the *base* commit, so the script that runs is the reviewed
+#      one rather than whatever the PR added;
+#   2. the PR is read as text only (`gh pr diff`, `gh pr view --json files`). Nothing
+#      from the PR is installed or executed.
+#
+# Automatic merging is limited to changes that touch nothing but `plugin_details.json`
+# and no trust-bearing key (digest/download/versions). It is off by default: set the
+# repository variable `AI_REVIEW_MODE=enforce` to turn it on. Index changes stay manual.
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: ai-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Read the diff and file list as text
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr diff "$PR" --repo "$GITHUB_REPOSITORY" > "$RUNNER_TEMP/pr.diff"
+          gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json files --jq '.files[].path' \
+            > "$RUNNER_TEMP/files.txt"
+          wc -c "$RUNNER_TEMP/pr.diff"
+          cat "$RUNNER_TEMP/files.txt"
+
+      - name: Ask the model
+        id: review
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          AI_REVIEW_MODEL: ${{ vars.AI_REVIEW_MODEL || 'deepseek-chat' }}
+          PR_DIFF_PATH: ${{ runner.temp }}/pr.diff
+          PR_FILES_PATH: ${{ runner.temp }}/files.txt
+          AI_REVIEW_COMMENT_PATH: ${{ runner.temp }}/comment.md
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: python scripts/ai_review.py
+
+      - name: Comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/comment.md"
+
+      - name: Label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          VERDICT: ${{ steps.review.outputs.verdict }}
+        run: |
+          case "$VERDICT" in
+            safe) label="ai:safe" ;;
+            malicious) label="ai:malicious" ;;
+            *) label="ai:needs-review" ;;
+          esac
+          gh label create "$label" --repo "$GITHUB_REPOSITORY" \
+            --color BFD4F2 --description "AI review verdict" --force >/dev/null 2>&1 || true
+          gh pr edit "$PR" --repo "$GITHUB_REPOSITORY" --add-label "$label"
+
+      - name: Enable auto-merge for description-only changes
+        # Two independent switches: the script must allow it, and the operator must have
+        # set AI_REVIEW_MODE=enforce. `--auto` still waits for `index` and `code` to pass,
+        # so the deterministic gates remain the last word.
+        if: steps.review.outputs.merge_allowed == 'true' && vars.AI_REVIEW_MODE == 'enforce'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: gh pr merge "$PR" --repo "$GITHUB_REPOSITORY" --auto --squash
+
+      - name: Report why auto-merge was not enabled
+        if: steps.review.outputs.merge_allowed != 'true'
+        env:
+          REASON: ${{ steps.review.outputs.merge_reason }}
+        run: |
+          echo "auto-merge not enabled: $REASON"
