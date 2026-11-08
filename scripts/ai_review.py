@@ -150,7 +150,7 @@ def _extract_json(text: str) -> dict:
             return json.loads(text[start : end + 1])
         except json.JSONDecodeError:
             pass
-    raise ReviewError("模型没有返回可解析的 JSON")
+    raise ReviewError(f"模型没有返回可解析的 JSON（开头：{text[:80]!r}）")
 
 
 def normalise(payload: dict) -> dict:
@@ -187,7 +187,9 @@ def call_model(prompt: str, *, api_key: str, model: str, base_url: str) -> str:
             {"role": "user", "content": prompt},
         ],
         "temperature": 0,
-        "max_tokens": 1200,
+        # Reasoning model: `completion_tokens` includes the hidden reasoning, so a small
+        # budget can be consumed before any `content` is produced.
+        "max_tokens": 3000,
     }
     request = urllib.request.Request(
         f"{base_url.rstrip('/')}/chat/completions",
@@ -205,12 +207,17 @@ def call_model(prompt: str, *, api_key: str, model: str, base_url: str) -> str:
     except (ValueError, TypeError) as exc:
         raise ReviewError("模型响应不是 JSON") from exc
 
-    try:
-        content = body["choices"][0]["message"]["content"]
-    except (KeyError, IndexError, TypeError) as exc:
-        raise ReviewError("模型响应缺少 choices[0].message.content") from exc
+    choice = (body.get("choices") or [{}])[0]
+    message = choice.get("message") or {}
+    content = message.get("content")
+    finish = choice.get("finish_reason", "?")
     if not content or not str(content).strip():
-        raise ReviewError("模型返回了空内容")
+        usage = body.get("usage") or {}
+        reasoning = (usage.get("completion_tokens_details") or {}).get("reasoning_tokens")
+        raise ReviewError(
+            f"模型返回空内容（finish_reason={finish}, reasoning_tokens={reasoning}, "
+            f"completion_tokens={usage.get('completion_tokens')}）"
+        )
     return str(content)
 
 
