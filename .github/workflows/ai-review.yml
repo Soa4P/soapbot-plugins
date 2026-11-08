@@ -28,6 +28,7 @@ concurrency:
 jobs:
   review:
     if: github.event.pull_request.draft == false
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

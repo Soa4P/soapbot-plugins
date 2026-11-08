@@ -56,3 +56,21 @@ python scripts/validate_index.py
 ```
 
 它会检查：JSON 可解析、`plugins.json` 里的每个名字在 `plugin_details.json` 与 `plugin_versions.json` 里都有对应条目、版本列表与版本元数据一致、封禁条目指向真实存在的版本、没有重复名字。
+
+CI 还有第二个 job（`code`），它检查的不是「现在自洽吗」而是「这次改动安全吗」：`download` 必须指向本仓库对应 `name-version` 的 release 路径、已发布版本的 `digest`/`download`/`released_at` 不可修改（要改就发新版本）、封禁与归档只增不减、`trusted_developers.json` 变更必须单独开 PR。
+
+## AI 审查与自动合并
+
+PR 会多一条 AI 评论，判 `safe` / `needs_review` / `malicious` 并说明理由。它按这个仓库的风险来判：不是「插件代码有没有后门」（代码不在这里），而是「这次改动有没有动 `digest` / `download` / `versions`，有没有让用户下载到别处」。
+
+**自动合并默认关闭。** 只有下面全部满足时才会开启：
+
+- AI 判 `safe` 且风险 `low`，diff 没被截断、没有降级；
+- 变更文件**只有** `plugin_details.json`；
+- 增删行里没有出现 `digest` / `download` / `versions` / `latest` 这些字段。
+
+其余一律留给人工，包括所有 `plugins.json`、`plugin_versions.json`、`blocked_versions.json`、`trusted_developers.json` 的改动。这不是保守设置的问题：`digest` 是宿主下载后比对的哈希，改它等于改掉所有已安装用户的信任对象。
+
+开关是仓库 variable `AI_REVIEW_MODE`：`observe`（默认，只评论）或 `enforce`（满足条件时 `gh pr merge --auto`）。即使 `enforce`，auto-merge 仍要等 `index` 与 `code` 两个检查通过 —— 确定性门禁始终是最后一道。
+
+配置：仓库 secret `DEEPSEEK_API_KEY`（必需）；variable `AI_REVIEW_MODEL`（可选，默认 `deepseek-chat`）。
