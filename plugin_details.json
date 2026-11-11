@@ -5,30 +5,98 @@
     "weather": {
       "summary": "查询城市天气与未来三天预报。",
       "description": "调用公开气象接口，按城市名或经纬度查询当前天气与三天预报。结果缓存十分钟，避免同一群反复查询打满上游配额。",
-      "capabilities": ["command", "http"],
+      "capabilities": [
+        "command",
+        "http"
+      ],
       "requires": [],
       "readme": "packages/weather/README.md"
     },
     "rss-digest": {
       "summary": "定时抓取 RSS 并汇总推送。",
       "description": "按 cron 表达式抓取配置里的订阅源，用关键词白名单过滤，把命中条目合并成一条消息。单次抓取有并发上限与超时，失败只跳过该源，不影响其余。",
-      "capabilities": ["command", "cron", "http", "send"],
+      "capabilities": [
+        "command",
+        "cron",
+        "http",
+        "send"
+      ],
       "requires": [],
       "readme": "packages/rss-digest/README.md"
     },
     "group-guard": {
       "summary": "群管理辅助。",
       "description": "关键词禁言、入群欢迎、重复消息折叠。禁言通过 send 能力下发，重复消息检测在内存里维护滑动窗口，重启后清空。",
-      "capabilities": ["command", "session", "send", "storage"],
+      "capabilities": [
+        "command",
+        "session",
+        "send",
+        "storage"
+      ],
       "requires": [],
       "readme": "packages/group-guard/README.md"
     },
     "kb-sync": {
       "summary": "本地 Markdown 增量同步进知识库。",
       "description": "扫描配置目录下的 Markdown 文件，按修改时间判断是否需要重新切分与索引。删除本地文件不会删除已入库的条目，需要手动清理——这是刻意的，避免误删。",
-      "capabilities": ["command", "kb_read", "storage"],
+      "capabilities": [
+        "command",
+        "kb_read",
+        "storage"
+      ],
       "requires": [],
       "readme": "packages/kb-sync/README.md"
+    },
+    "self-nudge": {
+      "summary": "给未来的自己留一句话。",
+      "description": "nudge <30m|2h|HH:MM> <话> 把一条留言写进插件加密 storage，cron 每分钟扫描，到点经 send 能力投回发起命令的那个会话（不广播）。投递措辞是「我想起一件事：……」，读起来是自己想起来了，不是闹钟响了。发送失败不删条目，下个 tick 重试。",
+      "capabilities": [
+        "command",
+        "cron",
+        "storage",
+        "send"
+      ],
+      "requires": [],
+      "readme": "packages/self-nudge/README.md"
+    },
+    "weather-alert": {
+      "summary": "中央气象台预警队列。",
+      "description": "weather-set 配置省份与经纬度后，每小时向 nmc.cn findAlarm 与 open-meteo 两个公开端点发 GET（无凭据），新预警经 send 播报到配置会话；已播报标题存加密 storage 去重（上限 200）。/weather 即时查看，/weather-ack 标记已说。",
+      "capabilities": [
+        "command",
+        "http",
+        "cron",
+        "storage",
+        "send"
+      ],
+      "requires": [],
+      "readme": "packages/weather-alert/README.md"
+    },
+    "bili-scroll": {
+      "summary": "每天刷一轮 B 站热门并出摘要报告。",
+      "description": "bili-scroll-set 配置关注词后，每天 09:00 经 bilibili 能力拉热门列表（公开接口；配置了 SOAPBOT_BILI_COOKIE 则带登录态），按确定性规则（关注词命中 - 标题党标记）筛选最多 5 条，报告经 send 推到配置会话。只读：不点赞、不评论、不关注。已推荐 bvid 去重上限 500。",
+      "capabilities": [
+        "command",
+        "bilibili",
+        "cron",
+        "storage",
+        "send"
+      ],
+      "requires": [
+        "宿主 >= 0.1.0 且启用 SOAPBOT_CHAT_TALK_ENABLED 之外的 bilibili 能力"
+      ],
+      "readme": "packages/bili-scroll/README.md"
+    },
+    "fishtalk-lite": {
+      "summary": "收视频语料、查八股。",
+      "description": "fish-collect 收视频标题/简介（≤200 字/条，300 条上限，加密 storage）作风格样本；fish-check 用确定性规则（八股词表 + 模板形状正则）给草稿打分；fish-forget 需确认词。检查不是自动拦截——soapbot 插件的 message hook 只读不拦，接进回复管线是宿主侧后续工作。",
+      "capabilities": [
+        "command",
+        "bilibili",
+        "storage"
+      ],
+      "requires": [],
+      "readme": "packages/fishtalk-lite/README.md"
     }
   }
 }
