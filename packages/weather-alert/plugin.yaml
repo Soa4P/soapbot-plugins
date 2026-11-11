@@ -1,0 +1,20 @@
+name: weather-alert
+version: 0.1.0
+entry: main:WeatherAlertPlugin
+description: >
+  把中央气象台预警变成「待说」队列。改编自 not-zai/weather-watch。
+  读了什么：只向两个公开端点发 GET——中央气象台 nmc.cn 的 findAlarm 接口（按配置的
+  省份）与 open-meteo 的 forecast 接口（按配置的经纬度），不带任何凭据；读取结果里
+  的预警标题/等级/时间与当前气温。发到哪里：不外发任何数据；预警只在有人问或 cron
+  到点时，经命令返回或 send 发到发起命令的会话。留不留副本：已播报过的预警标题
+  存插件加密 storage 作去重（最多 200 条），/weather-clear 可清空。
+author: soapbot-plugins
+trust: community
+channel: community
+min_host_version: 0.1.0
+capabilities:
+  - command
+  - http
+  - cron
+  - storage
+  - send

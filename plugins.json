@@ -1,12 +1,16 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-07",
+  "updated_at": "2026-11-12",
   "note": "Discovery only. Listing a plugin here does not approve it, does not vouch for it, and does not install it. soapbot fetches this file to answer 'does a newer version exist', and every install still goes through local upload, local approval and a digest check.",
   "plugins": [
     {
       "name": "weather",
       "latest": "1.2.0",
-      "versions": ["1.0.0", "1.1.0", "1.2.0"],
+      "versions": [
+        "1.0.0",
+        "1.1.0",
+        "1.2.0"
+      ],
       "summary": "查询城市天气与未来三天预报，数据来自公开气象接口。",
       "author": "Soa4P",
       "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/weather",
@@ -15,7 +19,11 @@
     {
       "name": "rss-digest",
       "latest": "0.4.1",
-      "versions": ["0.3.0", "0.4.0", "0.4.1"],
+      "versions": [
+        "0.3.0",
+        "0.4.0",
+        "0.4.1"
+      ],
       "summary": "定时抓取若干 RSS 源，按关键词过滤后汇总成一条消息推送。",
       "author": "Soa4P",
       "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/rss-digest",
@@ -24,7 +32,11 @@
     {
       "name": "group-guard",
       "latest": "2.0.0",
-      "versions": ["1.4.2", "1.5.0", "2.0.0"],
+      "versions": [
+        "1.4.2",
+        "1.5.0",
+        "2.0.0"
+      ],
       "summary": "群管理辅助：关键词禁言、入群欢迎、重复消息折叠。需要 send 与 session 能力。",
       "author": "Soa4P",
       "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/group-guard",
@@ -33,10 +45,57 @@
     {
       "name": "kb-sync",
       "latest": "0.2.0",
-      "versions": ["0.1.0", "0.2.0"],
+      "versions": [
+        "0.1.0",
+        "0.2.0"
+      ],
       "summary": "把本地 Markdown 目录增量同步进知识库，按文件修改时间判断是否需要重建索引。",
       "author": "Soa4P",
       "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/kb-sync",
+      "repository": "https://github.com/Soa4P/soapbot-plugins"
+    },
+    {
+      "name": "self-nudge",
+      "latest": "0.1.0",
+      "versions": [
+        "0.1.0"
+      ],
+      "summary": "给未来的自己留一句话，到点在原会话自己开口。改编自 not-zai/self-nudge。",
+      "author": "Soa4P",
+      "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/self-nudge",
+      "repository": "https://github.com/Soa4P/soapbot-plugins"
+    },
+    {
+      "name": "weather-alert",
+      "latest": "0.1.0",
+      "versions": [
+        "0.1.0"
+      ],
+      "summary": "中央气象台预警按配置省抓取，新预警播报到配置会话。改编自 not-zai/weather-watch。",
+      "author": "Soa4P",
+      "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/weather-alert",
+      "repository": "https://github.com/Soa4P/soapbot-plugins"
+    },
+    {
+      "name": "bili-scroll",
+      "latest": "0.1.0",
+      "versions": [
+        "0.1.0"
+      ],
+      "summary": "每天刷一轮 B 站热门，按关注词筛选出摘要报告推给你（只读，不写 B 站）。",
+      "author": "Soa4P",
+      "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/bili-scroll",
+      "repository": "https://github.com/Soa4P/soapbot-plugins"
+    },
+    {
+      "name": "fishtalk-lite",
+      "latest": "0.1.0",
+      "versions": [
+        "0.1.0"
+      ],
+      "summary": "收 B 站视频语料，发话前做八股检查。改编自 fishtalk 的 collect/check/forget。",
+      "author": "Soa4P",
+      "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/fishtalk-lite",
       "repository": "https://github.com/Soa4P/soapbot-plugins"
     }
   ]

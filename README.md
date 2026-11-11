@@ -49,3 +49,16 @@ python scripts/validate_index.py
 ## 审核边界
 
 合并一个 PR 意味着格式正确、描述与声明一致、没有明显恶意。它不意味着代码经过安全审计，也不意味着作者可信。装不装、给哪些能力，始终由部署 bot 的人决定。
+
+## 插件源码（packages/）
+
+本仓库的第二个角色：**soapbot 官方插件的源码与改编现场**。`packages/<name>/` 里是
+可打包的插件（`plugin.yaml` + `main.py` + README），发布流程见 VERSIONING.md。
+外部插件的改编逐仓记录在 [ADAPTATION.md](ADAPTATION.md)——运行时不照搬，功能对照
+改编，能力边界逐项核对；soapbot 能力面给不了的，列为待宿主能力而不是绕过。
+
+## 本地校验
+
+```bash
+python scripts/validate_index.py
+```

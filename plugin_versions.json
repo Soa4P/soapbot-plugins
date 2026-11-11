@@ -86,6 +86,42 @@
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/kb-sync-0.1.0/kb-sync-0.1.0.zip"
       }
+    ],
+    "self-nudge": [
+      {
+        "version": "0.1.0",
+        "released_at": "2026-11-11",
+        "digest": "sha256:1b97fee8527558f6fd280059024cfb6dd4975934ba7728c87f7883a2814e7c3a",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/self-nudge-0.1.0/self-nudge-0.1.0.zip"
+      }
+    ],
+    "weather-alert": [
+      {
+        "version": "0.1.0",
+        "released_at": "2026-11-11",
+        "digest": "sha256:e4a42fa5ca4fbb89959bd11ff5a456b0278ffc815e6f1a59062e6a1bb2e8f5d6",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/weather-alert-0.1.0/weather-alert-0.1.0.zip"
+      }
+    ],
+    "bili-scroll": [
+      {
+        "version": "0.1.0",
+        "released_at": "2026-11-11",
+        "digest": "sha256:4772e459d601142482e2b3f654c695ed22a3119dd2893978a148d5960f6116af",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/bili-scroll-0.1.0/bili-scroll-0.1.0.zip"
+      }
+    ],
+    "fishtalk-lite": [
+      {
+        "version": "0.1.0",
+        "released_at": "2026-11-11",
+        "digest": "sha256:adfc72388965ca46758189b4a0b7deb3abcfbc4b345de218555fdf59516896dc",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/fishtalk-lite-0.1.0/fishtalk-lite-0.1.0.zip"
+      }
     ]
   }
 }
