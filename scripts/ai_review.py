@@ -141,19 +141,40 @@ def _extract_json(text: str) -> dict:
         text = re.sub(r"^```[a-zA-Z]*\s*", "", text)
         text = re.sub(r"\s*```$", "", text)
     try:
-        return json.loads(text)
+        payload = json.loads(text)
     except json.JSONDecodeError:
         pass
+    else:
+        return _as_object(payload, text)
     start, end = text.find("{"), text.rfind("}")
     if start != -1 and end > start:
         try:
-            return json.loads(text[start : end + 1])
+            payload = json.loads(text[start : end + 1])
         except json.JSONDecodeError:
             pass
+        else:
+            return _as_object(payload, text)
     raise ReviewError(f"模型没有返回可解析的 JSON（开头：{text[:80]!r}）")
 
 
+def _as_object(payload: object, text: str) -> dict:
+    """Only a JSON object is usable.
+
+    ``json.loads("[]")``、``"null"``、``"42"`` 都能解析成功，返回的却不是对象。旧版本把
+    它们直接交给 ``normalise``，于是 ``payload.get`` 抛 AttributeError，审核步骤整个异常
+    退出，PR 上只剩一个没有解释的红叉（而 ``review`` 是必需检查）。在这里变成明确的
+    ``ReviewError``，由上层降级成 ``needs_review`` 并照常发评论。
+    """
+    if not isinstance(payload, dict):
+        raise ReviewError(
+            f"模型返回的 JSON 不是对象（{type(payload).__name__}；开头：{text[:80]!r}）"
+        )
+    return payload
+
+
 def normalise(payload: dict) -> dict:
+    if not isinstance(payload, dict):
+        raise ReviewError(f"normalise 收到非对象载荷：{type(payload).__name__}")
     verdict = str(payload.get("verdict", "")).strip().lower()
     risk = str(payload.get("risk", "")).strip().lower()
     if verdict not in VERDICTS:
