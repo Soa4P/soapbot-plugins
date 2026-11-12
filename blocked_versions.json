@@ -13,34 +13,34 @@
       "reason": "该版本在抓取失败时无限重试，会打满目标站点。"
     },
     {
-      "plugin": "self-nudge",
       "version": "0.1.0",
-      "reason": "manifest description contains forbidden token '/' — the host refuses to load it; fixed in 0.1.1"
+      "reason": "manifest description contains forbidden token '/' — the host refuses to load it; fixed in 0.1.1",
+      "name": "self-nudge"
     },
     {
-      "plugin": "weather-alert",
       "version": "0.1.0",
-      "reason": "manifest description contains forbidden token '/' — the host refuses to load it; fixed in 0.1.1"
+      "reason": "manifest description contains forbidden token '/' — the host refuses to load it; fixed in 0.1.1",
+      "name": "weather-alert"
     },
     {
-      "plugin": "bili-scroll",
       "version": "0.1.0",
-      "reason": "manifest description contains forbidden token '/' — the host refuses to load it; fixed in 0.1.1"
+      "reason": "manifest description contains forbidden token '/' — the host refuses to load it; fixed in 0.1.1",
+      "name": "bili-scroll"
     },
     {
-      "plugin": "fishtalk-lite",
       "version": "0.1.0",
-      "reason": "manifest description contains forbidden token '/' — the host refuses to load it; fixed in 0.1.1"
+      "reason": "manifest description contains forbidden token '/' — the host refuses to load it; fixed in 0.1.1",
+      "name": "fishtalk-lite"
     },
     {
-      "plugin": "auto-chat",
       "version": "0.1.0",
-      "reason": "manifest description contains forbidden token '/' — the host refuses to load it; fixed in 0.1.1"
+      "reason": "manifest description contains forbidden token '/' — the host refuses to load it; fixed in 0.1.1",
+      "name": "auto-chat"
     },
     {
-      "plugin": "sticker-album",
       "version": "0.1.0",
-      "reason": "manifest description contains forbidden token '/' — the host refuses to load it; fixed in 0.1.1"
+      "reason": "manifest description contains forbidden token '/' — the host refuses to load it; fixed in 0.1.1",
+      "name": "sticker-album"
     }
   ]
 }
