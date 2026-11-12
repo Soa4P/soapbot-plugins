@@ -92,10 +92,11 @@
     },
     {
       "name": "fishtalk-lite",
-      "latest": "0.1.1",
+      "latest": "0.3.0",
       "versions": [
         "0.1.0",
-        "0.1.1"
+        "0.1.1",
+        "0.3.0"
       ],
       "summary": "收 B 站视频语料，发话前做八股检查。改编自 fishtalk 的 collect/check/forget。",
       "author": "Soa4P",

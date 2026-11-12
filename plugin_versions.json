@@ -149,6 +149,13 @@
         "digest": "sha256:a9dc304f71a6fa7ef941fe7f30fc97f37559cfbcb887f182ad6e9760696fa8b4",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/fishtalk-lite-0.1.1/fishtalk-lite-0.1.1.zip"
+      },
+      {
+        "version": "0.3.0",
+        "released_at": "2026-11-12",
+        "digest": "sha256:c56cf7c2901e162ce1959ba6b75b7625c69875a64b1ee8f2fa353cb24e312d48",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/fishtalk-lite-0.3.0/fishtalk-lite-0.3.0.zip"
       }
     ],
     "auto-chat": [
