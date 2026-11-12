@@ -19,6 +19,8 @@ want model judging can pipe the report into their own flow.
 
 from __future__ import annotations
 
+import time
+
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
 
@@ -30,7 +32,18 @@ POPULAR_PATH = "/x/web-interface/popular"
 VIEW_PATH = "/x/web-interface/view"
 
 DEFAULT_KEYWORDS = ["教程", "科普", "开源", "记录", "实测"]
+
+#: bili-whale 的「生物钟 + 克制」思想，确定性落法：只在作息窗口抓取（默认
+#: 20:00-24:00），每轮读预算上限（热门列表 + 元数据次数），撞风控退避计数。
+#: 写预算不需要——本插件对 B 站零写入。判断标准硬编码。
+WINDOW_START_HOUR = 20
+WINDOW_END_HOUR = 24
+READ_BUDGET_PER_ROUND = 12
+RISK_BACKOFF_SECONDS = 1800
 CLICKBAIT_MARKERS = ["震惊", "竟然", "真相", "必看", "秒杀"]
+
+
+RISK_KEY = "risk_backoff_until"
 
 
 def _score(item: dict, keywords: list[str]) -> int:
@@ -57,7 +70,7 @@ class BiliScrollPlugin(Plugin):
             names = "、".join((keywords or DEFAULT_KEYWORDS)[:10])
             return f"已配置。关注词：{names}。每天 09:00 刷一轮，报告发到这个会话。"
 
-        @ctx.command("bili-scroll-now", description="现在刷一轮", usage="/bili-scroll-now")
+        @ctx.command("bili-scroll-now", description="现在刷一轮（无视作息窗口）", usage="/bili-scroll-now")
         async def scroll_now(caller: CallerContext, args: list[str]) -> str:
             return await _run_round(ctx, deliver_to=str(caller.session_key))
 
@@ -66,11 +79,20 @@ class BiliScrollPlugin(Plugin):
             ctx.storage.set(SEEN_KEY, [])
             return "已清空去重记录。"
 
-        @ctx.cron("0 9 * * *", name="bili-scroll-daily")
+        @ctx.cron("0 21 * * *", name="bili-scroll-daily")
         async def daily() -> None:
+            """作息窗口内的每日一轮（whale 的生物钟思想：每天只醒一两次）。"""
+            import datetime as dt
+
+            now = dt.datetime.now()
+            if now.hour < WINDOW_START_HOUR:
+                return  # 未到作息窗口；手动 /bili-scroll-now 不受此限
             cfg = ctx.storage.get(CFG_KEY) or {}
             if not cfg.get("session_key"):
                 return
+            backoff_until = float(ctx.storage.get(RISK_KEY) or 0)
+            if time.time() < backoff_until:
+                return  # 风控退避中：尊重平台，别硬顶
             report = await _run_round(ctx, deliver_to=None)
             if report:
                 try:
@@ -84,6 +106,10 @@ class BiliScrollPlugin(Plugin):
             seen = {str(b) for b in (ctx.storage.get(SEEN_KEY) or []) if isinstance(b, str)}
 
             payload = await ctx.bilibili.get_json(POPULAR_PATH, params={"ps": "40"})
+            if payload.get("code") == -412:
+                # 风控拦截（whale 的 412/429 退避思想）：半小时内不再碰 B 站。
+                ctx.storage.set(RISK_KEY, str(time.time() + RISK_BACKOFF_SECONDS))
+                return "B 站风控拦截了这轮抓取，半小时后重试。"
             if payload.get("code") != 0:
                 return f"B 站热门接口返回错误码 {payload.get('code')}"
             items = (payload.get("data") or {}).get("list") or []

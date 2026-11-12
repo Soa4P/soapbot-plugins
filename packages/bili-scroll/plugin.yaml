@@ -1,11 +1,11 @@
 name: bili-scroll
 version: 0.1.1
 entry: main:BiliScrollPlugin
-description: 每天替你刷一轮 B 站。改编自 c1overzz 的 dsh-bili-scroll 思路。向宿主钉死的 bilibili 域发 GET 拉热门列表（配置 SOAPBOT_BILI_COOKIE 则带登录态），按确定性规则筛出摘要报告，经 send 推到配置会话；只读，不点赞不评论不关注；已推荐 bvid 去重上限 500，bili-scroll-forget 清空。
+description: 每天替你刷一轮 B 站。改编自 c1overzz 的 dsh-bili-scroll 思路。向宿主钉死的 bilibili 域发 GET 拉热门列表（配置 SOAPBOT_BILI_COOKIE 则带登录态），按确定性规则筛出摘要报告，经 send 推到配置会话；只读，不点赞不评论不关注；0.2.0 按 dsh-bili-whale 的克制思想加作息窗口（21 点后抓取）与风控退避（撞 412 半小时不碰 B 站）；已推荐 bvid 去重上限 500，bili-scroll-forget 清空。
 author: soapbot-plugins
 trust: community
 channel: community
-min_host_version: 0.1.0
+min_host_version: 0.2.0
 capabilities:
   - command
   - bilibili

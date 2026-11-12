@@ -1,7 +1,7 @@
 name: fishtalk-lite
-version: 0.1.1
+version: 0.2.0
 entry: main:FishTalkLitePlugin
-description: 教机器人说人话。改编自 Nozzi2455 的 fishtalk。收视频标题与简介（每条 200 字内，300 条上限，加密 storage）作语料样本；fish-check 用确定性词表加形状规则给草稿打分；不存评论与用户隐私；fish-forget 需确认词。
+description: 教机器人说人话。改编自 Nozzi2455 的 fishtalk。收视频字幕正文（宿主代签代抓，每条 200 字内，300 条上限，加密 storage）作语料样本；无字幕退回标题简介；fish-check 用确定性词表加形状规则给草稿打分；不存评论与用户隐私；fish-forget 需确认词。
 author: soapbot-plugins
 trust: community
 channel: community
