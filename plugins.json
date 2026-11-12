@@ -104,10 +104,11 @@
     },
     {
       "name": "auto-chat",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "versions": [
         "0.1.0",
-        "0.1.1"
+        "0.1.1",
+        "0.2.0"
       ],
       "summary": "在被开启的会话里偶尔自己开口：温度阈值 + 频率硬上限 + 话题片段开口。",
       "author": "Soa4P",
@@ -124,6 +125,17 @@
       "summary": "机器人自己的表情包相册：存/按标签找/发出去（需 send_media 能力）。",
       "author": "Soa4P",
       "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/sticker-album",
+      "repository": "https://github.com/Soa4P/soapbot-plugins"
+    },
+    {
+      "name": "meme-wiki",
+      "latest": "0.1.0",
+      "versions": [
+        "0.1.0"
+      ],
+      "summary": "网络梗词典：查梗、自建词条、同步 cnmeme.wiki 词库。改编自 dsh-memewiki。",
+      "author": "Soa4P",
+      "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/meme-wiki",
       "repository": "https://github.com/Soa4P/soapbot-plugins"
     }
   ]

@@ -21,6 +21,19 @@ bundle），soapbot 插件跑在 `python -I` 子进程里、每个能力都要�
 | [Mieksido/surfcore](https://github.com/Mieksido/surfcore) | DSH 的完整身份/记忆/作息框架 | ⛔ | 本体级框架，且其治理机制已按 `docs/reference-dsh-ecosystem.md` 的评估吸收进宿主（rid 关联、帧预算、fail-closed 工具面、发布门禁）。桌宠/Windows ACL 形态不适配 |
 | [mashanglinyu/luanyujia-workbench](https://github.com/mashanglinyu/luanyujia-workbench) | 多场景工作台：宪法/场景/记忆模板 | 🚧 | 产物是 Markdown 模板与组织方法，不是代码——改编形态是「kb_read + 命令」的场景模板插件，模板正文放进 packages/ 的纯文本。用户注明「源码照搬全量更新！」：**照搬的是模板与结构，不照搬任何运行时**（其运行时是 dsh 配置脚本，直接搬会把宿主语义带进来）。待下一批 |
 
+## 第二批改编（2026-11-12，六个新参考仓库）
+
+| 参考仓库 | 一句话 | 状态 | 改编落点 |
+|---|---|---|---|
+| [thawline/dsh-memewiki](https://github.com/thawline/dsh-memewiki) | 梗百科：预查注入 + 6792 条离线词库 | ✅ `meme-wiki` 0.1.0 | 命令式查询 + 双向匹配 + 同步（cnmeme.wiki 公开 API）。**预查注入列待宿主能力**——message 钩子只读，回复管线注入点插件够不到；反馈上传不做（涉及第三方账号凭证） |
+| [menglimi/astrbot_plugin_private_companion](https://github.com/menglimi/astrbot_plugin_private_companion) | 一站式拟人化陪伴套件（作息/记忆/主动联系/七能力） | ⛔ 整体 / ✅ 思想并入 | 本体级巨型套件，soapbot 已有对应积木：温度模型（宿主）、auto-chat（主动开口）、审批总线。**作息感知思想并入 auto-chat 0.2.0**（深夜不打扰 + 晨间语气），拆解路线见下 |
+| [mearihaka/dsh-longing](https://github.com/mearihaka/dsh-longing) | 暗涌：七维数值状态机渲染内心状态 | ⛔ 状态机 / 🚧 设计输入 | #53 已定立场：soapbot 温度由宿主管线确定性计算、不由对话推动任意值。但它的**事件→维度映射表 + 每维独立半衰与日常值回归**是温度模型 v2 的直接设计输入（warmth 三参数可扩展负向事件与日常回归），记录进 docs/qq-autonomy-design.md |
+| [Yuuyuko-uu/dsh-xingxi](https://github.com/Yuuyuko-uu/dsh-xingxi) | 记忆星图可视化 + 档案检索 | 🚧 | 检索已有（/recall、timeline）；星图可视化是面板前端工作（本体），等前端排期；档案整理（拾星）可改编为 kb/memory 写入插件——但写入能力未开放，先记 |
+| [kukemc/bili-cli](https://github.com/kukemc/bili-cli) | UP 主运营全套（发动态/评论/私信/数据） | 🚧 需写面 | soapbot 的 bilibili 能力目前只读（GET）。写动作（发动态/评论）按 qzone 模式：动作白名单 + SESSDATA 宿主注入 + 独立审批 + 显式确认 + 风险自负。等操作者确认接受写风险后落地 `bili-poster` |
+| [Mieksido/surfcore](https://github.com/Mieksido/surfcore) | DSH 完整身份框架 | ⛔ | 维持 #1 批评估：治理机制已吸收进宿主 |
+
+**private_companion 拆解路线**（不整体改编）：连续会话与记忆=宿主已有；主动联系=auto-chat；表情包=sticker-album；生活作息=auto-chat 0.2.0；创作/生图/识屏/游戏=对应宿主能力面（screen 见 autonomous-capabilities-design.md），逐个成熟逐个拆。
+
 ## 逐项边界核对（已落地的四个）
 
 每个包的 README 都写了「读了什么/发到哪里/留不留副本」；这里是边界层面的硬核对：

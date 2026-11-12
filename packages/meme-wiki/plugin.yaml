@@ -1,0 +1,20 @@
+name: meme-wiki
+version: 0.1.0
+entry: main:MemeWikiPlugin
+description: >
+  网络梗词典：查梗、自建词条、按需同步词库。改编自 thawline 的 dsh-memewiki
+  （词库源 cnmeme.wiki 公开接口），改为 soapbot 命令式查询。读了什么：meme-sync
+  与 meme-search 向 cnmeme.wiki 的公开 API 发 GET（无凭据）；词条正文与别名存
+  插件加密 storage（上限 2000 条）。发到哪里：查询结果只经命令返回；不外发任何
+  数据，不向词库站点上传（原版的反馈上传通道不做——上传涉及账号凭证）。留不留
+  副本：storage 里的词条即副本，meme-forget 全清。原版的「预查注入」（模型看到
+  消息前自动塞词条）依赖宿主回复管线注入点，soapbot 插件面还没有——列在宿主
+  待能力清单，本版只做命令式查询。
+author: soapbot-plugins
+trust: community
+channel: community
+min_host_version: 0.1.0
+capabilities:
+  - command
+  - http
+  - storage

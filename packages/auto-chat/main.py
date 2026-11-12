@@ -37,6 +37,18 @@ OPENERS = [
     "{topic}——想到这个，顺便问一句。",
 ]
 
+MORNING_OPENERS = [
+    "早。昨晚想到「{topic}」，总觉得该问问。",
+    "刚起来就想起来「{topic}」这事，有后续吗？",
+]
+
+#: 深夜不打扰（23:00-07:30）。private_companion 的「生活作息」思想、longing 的
+#: 「会累」思想，soapbot 式的落法：一条确定性时间规则，温度极高也只放行轻声模板，
+#: 而不是把夜话写成另一种人格。判断标准硬编码。
+QUIET_START_HOUR = 23
+QUIET_END_HOUR = 7
+DEEP_NIGHT_WARMTH = 0.9
+
 
 def _warmth(count: int, last_seen: float) -> float:
     """近 7 天交互的对数归一 × 最近交互衰减（7 天半衰）。"""
@@ -110,6 +122,11 @@ class AutoChatPlugin(Plugin):
             warmth = ctx.storage.get(WARMTH_KEY) or {}
             snippets = ctx.storage.get(SNIPPETS_KEY) or {}
             now = time.time()
+            import datetime as dt
+
+            now_local = dt.datetime.now()
+            quiet = now_local.hour >= QUIET_START_HOUR or now_local.hour < QUIET_END_HOUR
+            morning = QUIET_END_HOUR <= now_local.hour < 9
             for session, conf in cfg.items():
                 if not isinstance(conf, dict):
                     continue
@@ -117,6 +134,8 @@ class AutoChatPlugin(Plugin):
                 w = _warmth(int(entry.get("count", 0)), float(entry.get("last", 0)))
                 if w < float(conf.get("threshold", WARMTH_FLOOR)):
                     continue
+                if quiet and w < DEEP_NIGHT_WARMTH:
+                    continue  # 深夜不打扰；温度极高也只允许轻声模板
                 last_spoke = float(entry.get("last_spoke", 0))
                 if now - last_spoke < MIN_GAP_SECONDS:
                     continue
@@ -126,7 +145,8 @@ class AutoChatPlugin(Plugin):
                 if not pieces:
                     continue
                 topic = pieces[-1]
-                template = OPENERS[int(now) % len(OPENERS)]
+                pool = MORNING_OPENERS if morning else OPENERS
+                template = pool[int(now) % len(pool)]
                 text = template.format(topic=topic)
                 try:
                     await ctx.send(text, session_key=session)
