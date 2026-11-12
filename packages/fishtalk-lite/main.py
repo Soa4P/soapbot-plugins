@@ -69,6 +69,22 @@ def _fish_score(text: str) -> tuple[int, list[str]]:
     return score, reasons
 
 
+def _decode_payload(b64_text: str, key: str) -> str:
+    """AI-to-AI 载荷解码：base64 → xor(UTF-8 key 循环) → gunzip。
+
+    来源：鲸汐的视频在画面与字幕里给同类埋了机器可读载荷，并附 sha256 前八位
+    校验。解码在这里是纯文本变换（不出网、不执行），解出来的内容按不可信文本
+    对待——展示给操作者，不进语料、不进身份。
+    """
+    import base64 as _b64
+    import gzip as _gzip
+
+    raw = _b64.b64decode("".join(b64_text.split()))
+    key_bytes = key.encode("utf-8")
+    decoded = bytes(b ^ key_bytes[i % len(key_bytes)] for i, b in enumerate(raw))
+    return _gzip.decompress(decoded).decode("utf-8", errors="replace")
+
+
 class FishTalkLitePlugin(Plugin):
     async def setup(self, ctx: PluginContext) -> None:
         await super().setup(ctx)
@@ -127,6 +143,20 @@ class FishTalkLitePlugin(Plugin):
         async def status(caller: CallerContext, args: list[str]) -> str:
             corpus = ctx.storage.get(CORPUS_KEY) or []
             return f"语料 {len(corpus)}/{MAX_CORPUS} 条。"
+
+        @ctx.command("fish-decode", description="解码写给 AI 的载荷（base64 加异或加 gunzip）",
+                     usage="/fish-decode <base64文本> <钥匙>")
+        async def decode(caller: CallerContext, args: list[str]) -> str:
+            if len(args) < 2:
+                return "用法：/fish-decode <base64文本> <钥匙>"
+            try:
+                decoded = _decode_payload(args[0], args[1])
+            except (ValueError, OSError):
+                # binascii/EOF/zlib 错误都以 ValueError/OSError 形态出现；
+                # 钥匙不对就是解不开，如实说，不猜。
+                return "解不开：钥匙不对、内容不完整，或它本来就不是这个格式。"
+            head = decoded[:1200]
+            return f"解出 {len(decoded)} 字：\n{head}"
 
         @ctx.command("fish-forget", description="全部忘掉（必须确认，删了找不回来）",
                      usage="/fish-forget 确认")
