@@ -1,0 +1,19 @@
+name: sticker-album
+version: 0.1.0
+entry: main:StickerAlbumPlugin
+description: >
+  机器人自己的表情包与照片相册：存、按标签找、发出去。读了什么：/meme-save 传入的
+  URL（经 http 能力抓取，宿主沙箱有目的地白名单与禁重定向；操作者需把图床域名加进
+  http 允许列表）与 base64 内容；读取结果只进插件加密 storage。发到哪里：图片经
+  send_media 能力发到发起命令的会话（宿主 ledger 校验，另需单独批准 send_media）。
+  留不留副本：图片（base64，单张 ≤4MiB，总量 ≤100 张）与标签存加密 storage，
+  /meme-forget 确认后全清。不抓网页正文、不存用户聊天内容。
+author: soapbot-plugins
+trust: community
+channel: community
+min_host_version: 0.1.0
+capabilities:
+  - command
+  - http
+  - storage
+  - send_media

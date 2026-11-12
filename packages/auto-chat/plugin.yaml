@@ -1,0 +1,22 @@
+name: auto-chat
+version: 0.1.0
+entry: main:AutoChatPlugin
+description: >
+  让机器人在被开启的会话里偶尔自己开口，制造「想起来就说话」的真人感。改编思路来自
+  not-zai/self-nudge 与 surfcore 的作息概念，但判断全部在本插件内、确定性、可审计。
+  读了什么：message 钩子看到的消息文本前 200 字符（只用于提取话题片段与计数），以及
+  本插件自己的加密 storage。发到哪里：只发到操作者用 /autochat-set 显式开启、且
+  宿主 ledger 记录为本插件观察过的会话；从不广播。留不留副本：每个开启会话的最近
+  3 条话题片段 + 交互计数 + 冷却时间戳存加密 storage；消息原文不落盘，命令 /autochat-clear
+  可清空。频率写死：同一会话两条主动发言 ≥4 小时、每会话每天 ≤2 条、每轮 cron 全局
+  只挑一个会话。判断标准（温度公式、模板）硬编码——判断标准悄悄可改等于行为悄悄可改。
+author: soapbot-plugins
+trust: community
+channel: community
+min_host_version: 0.1.0
+capabilities:
+  - command
+  - message
+  - cron
+  - storage
+  - send

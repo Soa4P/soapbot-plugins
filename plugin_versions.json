@@ -122,6 +122,24 @@
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/fishtalk-lite-0.1.0/fishtalk-lite-0.1.0.zip"
       }
+    ],
+    "auto-chat": [
+      {
+        "version": "0.1.0",
+        "released_at": "2026-11-11",
+        "digest": "sha256:d6264beb4650c0c1e40e31cbe812ff278cb9191be425f83ff92c001cda729817",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/auto-chat-0.1.0/auto-chat-0.1.0.zip"
+      }
+    ],
+    "sticker-album": [
+      {
+        "version": "0.1.0",
+        "released_at": "2026-11-11",
+        "digest": "sha256:b6a521f048706c61ecdaa2c41f5fa45751672b606fea9441936dde08d65f742f",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/sticker-album-0.1.0/sticker-album-0.1.0.zip"
+      }
     ]
   }
 }
