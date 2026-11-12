@@ -34,6 +34,17 @@ bundle），soapbot 插件跑在 `python -I` 子进程里、每个能力都要�
 
 **private_companion 拆解路线**（不整体改编）：连续会话与记忆=宿主已有；主动联系=auto-chat；表情包=sticker-album；生活作息=auto-chat 0.2.0；创作/生图/识屏/游戏=对应宿主能力面（screen 见 autonomous-capabilities-design.md），逐个成熟逐个拆。
 
+## 第三批改编（2026-11-13，六个参考仓库）
+
+| 参考仓库 | 一句话 | 状态 | 改编落点 |
+|---|---|---|---|
+| [InariNGT-Ofiicial/dsh-bili-humanism](https://github.com/InariNGT-Ofiicial/dsh-bili-humanism) | B 站字幕学习（WBI 签名/ASR/抽帧） | ✅ 字幕语料 | 第一批的阻塞已解除：宿主 `bilibili.subtitle_text`（wbi 签名 + hdslb 抓取，#52 面）落地，`fishtalk-lite` 0.2.0 的 collect 升级为字幕正文语料（无字幕退回简介）。ASR 与抽帧仍不改编——本地 Whisper 与画面抓取超出能力面 |
+| [Nozzi2455/fishtalk](https://github.com/Nozzi2455/fishtalk) | 学真人说话、拦八股 | ✅ 升级 0.2.0 | collect 从标题简介升级为字幕语料；check/forget 不变 |
+| [Alterssss/dsh-bili-whale](https://github.com/Alterssss/dsh-bili-whale) | 有日子的鱼：生物钟+偏好+克制 | ✅ 并入 `bili-scroll` 0.2.0 | 作息窗口（21 点后抓取）、撞风控半小时退避、手动刷轮不受限。whale 的写动作（评论/私信）不改编——零写入立场 |
+| [CatisAkaLi/dsh-diary-relation-check](https://github.com/CatisAkaLi/dsh-diary-relation-check) | 记忆更新后触发关系复盘（分层抽读年1/月3/周4/日7） | 🚧 | 「模型判断」需要宿主定时语义任务能力（插件无模型面）；分层抽读是好的预算模板，登记为温度 v2/定时语义任务设计输入 |
+| [wonderandyou/dsh-grow](https://github.com/wonderandyou/dsh-grow) | 亲近/信任双维仪表盘 + 自动情绪记忆 | 🚧 | 多维温度（亲近与信任分离）是温度 v2 的第二个设计输入；「自动记忆只管情绪、技术细节归工程记忆」的分工立场与本仓库 memory 分层一致，无需改编 |
+| [Yuuyuko-uu/dsh-fish-buddy](https://github.com/Yuuyuko-uu/dsh-fish-buddy) | 桌面挂件 + 本机开口转发会话 | ⛔ | 已有等价积木：桌面壳（Tauri）、多端对话（web/mobile）、send_media（图片进会话）；本机开口需鉴权（文件总线式无鉴权通道此前已 ⛔） |
+
 ## 逐项边界核对（已落地的四个）
 
 每个包的 README 都写了「读了什么/发到哪里/留不留副本」；这里是边界层面的硬核对：

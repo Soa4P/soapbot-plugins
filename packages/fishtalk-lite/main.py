@@ -73,19 +73,34 @@ class FishTalkLitePlugin(Plugin):
     async def setup(self, ctx: PluginContext) -> None:
         await super().setup(ctx)
 
-        @ctx.command("fish-collect", description="收一个视频的标题/简介作语料样本",
+        @ctx.command("fish-collect", description="收一个视频的字幕正文作语料样本（无字幕退回简介）",
                      usage="/fish-collect <BV号>")
         async def collect(caller: CallerContext, args: list[str]) -> str:
             if not args or not args[0].startswith("BV"):
                 return "用法：/fish-collect <BV号>"
-            payload = await ctx.bilibili.get_json(VIEW_PATH, params={"bvid": args[0]})
+            bvid = args[0]
+            # 字幕正文由宿主 L2 client 代签代抓（wbi + hdslb），插件只发 bvid。
+            # 这是 dsh-bili-humanism 的核心思想在 soapbot 边界内的落法：
+            # 「真看懂视频」的第一步是拿到原文，签名与抓取属于宿主能力面。
+            subtitle_text = ""
+            try:
+                sub = await ctx.bilibili.subtitle(bvid)
+                subtitle_text = str(sub.get("text") or "")
+            except (ValueError, RuntimeError):
+                # 无字幕、未配置、宿主未接——都退回标题+简介。能力拒绝
+                # （PermissionError）不在这里吞：没批准就该看得见拒绝。
+                subtitle_text = ""
+            payload = await ctx.bilibili.get_json(VIEW_PATH, params={"bvid": bvid})
             if payload.get("code") != 0:
-                return f"没有找到 {args[0]}（B 站错误码 {payload.get('code')}）"
+                return f"没有找到 {bvid}（B 站错误码 {payload.get('code')}）"
             data = payload.get("data") or {}
             title = str(data.get("title") or "")
             desc = str(data.get("desc") or "")
             owner = str((data.get("owner") or {}).get("name") or "")
-            sample = f"{title}｜{owner}｜{desc}"[:MAX_SAMPLE_CHARS]
+            if subtitle_text:
+                sample = f"{title}（UP：{owner}）字幕｜{subtitle_text}"[:MAX_SAMPLE_CHARS]
+            else:
+                sample = f"{title}｜{owner}｜{desc}"[:MAX_SAMPLE_CHARS]
             if not sample.strip("｜"):
                 return "这个视频没有可采样的文本。"
             corpus = ctx.storage.get(CORPUS_KEY) or []
@@ -94,7 +109,8 @@ class FishTalkLitePlugin(Plugin):
             corpus.append(sample)
             corpus = corpus[-MAX_CORPUS:]
             ctx.storage.set(CORPUS_KEY, corpus)
-            return f"已收（语料 {len(corpus)} 条）。多收几个你常看的 UP，检查才有基准。"
+            kind = "字幕" if subtitle_text else "简介"
+            return f"已收{kind}语料（{len(corpus)} 条）。多收几个你常看的 UP，检查才有基准。"
 
         @ctx.command("fish-check", description="检查一段话有没有鱼味", usage="/fish-check <草稿>")
         async def check(caller: CallerContext, args: list[str]) -> str:
