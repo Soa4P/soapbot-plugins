@@ -46,8 +46,8 @@ BOILERPLATE = [
 #: 模板形状：破折号小标题、三段式总结开头。
 TEMPLATE_SHAPES = [
     re.compile(r"——[^—\n]{2,12}："),
-    re.compile(r"^首先[，,]", re.M),
-    re.compile(r"^总之[，,]", re.M),
+    re.compile(r"^首先[，,]", re.MULTILINE),
+    re.compile(r"^总之[，,]", re.MULTILINE),
 ]
 
 

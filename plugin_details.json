@@ -97,6 +97,33 @@
       ],
       "requires": [],
       "readme": "packages/fishtalk-lite/README.md"
+    },
+    "auto-chat": {
+      "summary": "在被开启的会话里偶尔自己开口。",
+      "description": "autochat-set 开启后，消息钩子按会话攒话题片段（前 120 字符，原文不落盘）与交互计数；cron 每 30 分钟挑一个温度达阈、过冷却（≥4 小时、每天 ≤2 条）的会话，用片段套固定模板开口经 send 投回原会话。温度公式确定性：log1p(近7天交互)/log1p(200) × 半衰 7 天的时间衰减。无模型调用。",
+      "capabilities": [
+        "command",
+        "message",
+        "cron",
+        "storage",
+        "send"
+      ],
+      "requires": [],
+      "readme": "packages/auto-chat/README.md"
+    },
+    "sticker-album": {
+      "summary": "机器人自己的表情包相册。",
+      "description": "meme-save 从 URL 抓图（http 白名单域）以 base64 存插件加密 storage（≤100 张、单张 ≤3MiB 入库），按标签检索；meme-send 经 send_media 能力发到当前会话（宿主 ledger + 独立审批 + 4MiB 双边界上限）。不抓网页正文、不存聊天内容。",
+      "capabilities": [
+        "command",
+        "http",
+        "storage",
+        "send_media"
+      ],
+      "requires": [
+        "宿主需含 send_media 能力面（main 仓库 send-media 之后）"
+      ],
+      "readme": "packages/sticker-album/README.md"
     }
   }
 }

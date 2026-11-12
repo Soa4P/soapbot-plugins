@@ -97,6 +97,28 @@
       "author": "Soa4P",
       "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/fishtalk-lite",
       "repository": "https://github.com/Soa4P/soapbot-plugins"
+    },
+    {
+      "name": "auto-chat",
+      "latest": "0.1.0",
+      "versions": [
+        "0.1.0"
+      ],
+      "summary": "在被开启的会话里偶尔自己开口：温度阈值 + 频率硬上限 + 话题片段开口。",
+      "author": "Soa4P",
+      "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/auto-chat",
+      "repository": "https://github.com/Soa4P/soapbot-plugins"
+    },
+    {
+      "name": "sticker-album",
+      "latest": "0.1.0",
+      "versions": [
+        "0.1.0"
+      ],
+      "summary": "机器人自己的表情包相册：存/按标签找/发出去（需 send_media 能力）。",
+      "author": "Soa4P",
+      "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/sticker-album",
+      "repository": "https://github.com/Soa4P/soapbot-plugins"
     }
   ]
 }
