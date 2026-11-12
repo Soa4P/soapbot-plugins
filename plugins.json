@@ -56,9 +56,10 @@
     },
     {
       "name": "self-nudge",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "versions": [
-        "0.1.0"
+        "0.1.0",
+        "0.1.1"
       ],
       "summary": "给未来的自己留一句话，到点在原会话自己开口。改编自 not-zai/self-nudge。",
       "author": "Soa4P",
@@ -67,9 +68,10 @@
     },
     {
       "name": "weather-alert",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "versions": [
-        "0.1.0"
+        "0.1.0",
+        "0.1.1"
       ],
       "summary": "中央气象台预警按配置省抓取，新预警播报到配置会话。改编自 not-zai/weather-watch。",
       "author": "Soa4P",
@@ -78,9 +80,10 @@
     },
     {
       "name": "bili-scroll",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "versions": [
-        "0.1.0"
+        "0.1.0",
+        "0.1.1"
       ],
       "summary": "每天刷一轮 B 站热门，按关注词筛选出摘要报告推给你（只读，不写 B 站）。",
       "author": "Soa4P",
@@ -89,9 +92,10 @@
     },
     {
       "name": "fishtalk-lite",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "versions": [
-        "0.1.0"
+        "0.1.0",
+        "0.1.1"
       ],
       "summary": "收 B 站视频语料，发话前做八股检查。改编自 fishtalk 的 collect/check/forget。",
       "author": "Soa4P",
@@ -100,9 +104,10 @@
     },
     {
       "name": "auto-chat",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "versions": [
-        "0.1.0"
+        "0.1.0",
+        "0.1.1"
       ],
       "summary": "在被开启的会话里偶尔自己开口：温度阈值 + 频率硬上限 + 话题片段开口。",
       "author": "Soa4P",
@@ -111,9 +116,10 @@
     },
     {
       "name": "sticker-album",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "versions": [
-        "0.1.0"
+        "0.1.0",
+        "0.1.1"
       ],
       "summary": "机器人自己的表情包相册：存/按标签找/发出去（需 send_media 能力）。",
       "author": "Soa4P",

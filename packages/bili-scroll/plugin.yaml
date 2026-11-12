@@ -1,14 +1,7 @@
 name: bili-scroll
-version: 0.1.0
+version: 0.1.1
 entry: main:BiliScrollPlugin
-description: >
-  每天替你刷一轮 B 站：拉热门列表，按规则筛选值得看的，写一份摘要报告，特别值得的
-  单独提醒。改编自 c1overzz/dsh-bili-scroll 的「自己搜、自己判断、写报告、@你」思路。
-  读了什么：向 api.bilibili.com 发 GET（热门列表与视频元数据，宿主钉死的域；若操作者
-  配置了 SOAPBOT_BILI_COOKIE 则带登录态，不配置则只用公开接口）；读取标题/简介/UP 主/
-  播放数据。发到哪里：报告经命令返回或 send 发到发起配置的会话；不向 B 站写任何数据
-  （不点赞、不评论、不关注——v1 是只读的）。留不留副本：已推荐过的 bvid 存插件加密
-  storage 去重（上限 500），/bili-scroll-forget 清空；不存视频内容本体。
+description: 每天替你刷一轮 B 站。改编自 c1overzz 的 dsh-bili-scroll 思路。向宿主钉死的 bilibili 域发 GET 拉热门列表（配置 SOAPBOT_BILI_COOKIE 则带登录态），按确定性规则筛出摘要报告，经 send 推到配置会话；只读，不点赞不评论不关注；已推荐 bvid 去重上限 500，bili-scroll-forget 清空。
 author: soapbot-plugins
 trust: community
 channel: community

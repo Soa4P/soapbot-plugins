@@ -1,13 +1,7 @@
 name: self-nudge
-version: 0.1.0
+version: 0.1.1
 entry: main:SelfNudgePlugin
-description: >
-  让机器人给未来的自己留一句话，到点自己开口。改编自 not-zai/self-nudge。
-  读了什么：只读本插件自己的加密 storage（nudge 列表）；发起命令的会话身份来自宿主
-  传入的 caller，不从消息内容推导。发到哪里：只往发起命令的那个会话投递（宿主的
-  send 面本来就只允许发到本插件观察过的会话，这里进一步收窄为 caller 会话）。
-  留不留副本：nudge 条目（时间 + 内容 + 目标会话）存在插件加密 storage，投递成功
-  即删；/nudge-list 可查看，/nudge-clear 全清。不写任何文件到插件目录之外。
+description: 让机器人给未来的自己留一句话，到点自己开口。改编自 not-zai 的 self-nudge。只读本插件加密 storage 的留言列表；投递只发回发起命令的那个会话；留言（时间加内容加目标会话）存加密 storage，投递成功即删，nudge-list 可查看，nudge-clear 全清，不写文件到插件目录之外。
 author: soapbot-plugins
 trust: community
 channel: community

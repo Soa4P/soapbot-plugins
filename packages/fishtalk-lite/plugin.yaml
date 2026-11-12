@@ -1,13 +1,7 @@
 name: fishtalk-lite
-version: 0.1.0
+version: 0.1.1
 entry: main:FishTalkLitePlugin
-description: >
-  教机器人说人话：收视频做语料、发话前做「八股检查」。改编自 Nozzi2455/fishtalk。
-  读了什么：向 api.bilibili.com 发 GET 拉视频元数据（宿主钉死的域；配置了
-  SOAPBOT_BILI_COOKIE 则带登录态）；把标题/简介/UP 风格样本存进插件加密 storage。
-  发到哪里：不外发任何数据；检查结果只经命令返回。留不留副本：语料样本（标题/简介
-  摘要，每条 ≤200 字符）存 storage，上限 300 条，/fish-forget 全清；不存评论、
-  不存用户隐私内容。
+description: 教机器人说人话。改编自 Nozzi2455 的 fishtalk。收视频标题与简介（每条 200 字内，300 条上限，加密 storage）作语料样本；fish-check 用确定性词表加形状规则给草稿打分；不存评论与用户隐私；fish-forget 需确认词。
 author: soapbot-plugins
 trust: community
 channel: community
