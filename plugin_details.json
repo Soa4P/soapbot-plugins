@@ -124,6 +124,17 @@
         "宿主需含 send_media 能力面（main 仓库 send-media 之后）"
       ],
       "readme": "packages/sticker-album/README.md"
+    },
+    "meme-wiki": {
+      "summary": "网络梗词典，查询与自建词条。",
+      "description": "meme 查梗（双向匹配标题与别名）、meme-add 手动补词条（同步不覆盖）、meme-sync 从 cnmeme.wiki 公开 API 同步（无凭据 GET，上限 2000 条）。原版的预查注入依赖宿主回复管线注入点，列待能力项；反馈上传涉及第三方账号凭证，不做。",
+      "capabilities": [
+        "command",
+        "http",
+        "storage"
+      ],
+      "requires": [],
+      "readme": "packages/meme-wiki/README.md"
     }
   }
 }

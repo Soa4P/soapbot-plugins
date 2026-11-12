@@ -1,7 +1,7 @@
 name: auto-chat
-version: 0.1.1
+version: 0.2.0
 entry: main:AutoChatPlugin
-description: 让机器人在被开启的会话里偶尔自己开口。改编思路来自 not-zai 的 self-nudge 与 surfcore 的作息概念。消息钩子只取前 120 字符攒话题片段，原文不落盘；只发到 autochat-set 显式开启且宿主记录为观察过的会话；频率写死（同会话间隔 4 小时以上、每天最多 2 条、每轮全局一个会话），判断标准硬编码。
+description: 让机器人在被开启的会话里偶尔自己开口。改编思路来自 not-zai 的 self-nudge 与 surfcore 的作息概念。消息钩子只取前 120 字符攒话题片段，原文不落盘；只发到 autochat-set 显式开启且宿主记录为观察过的会话；频率写死（同会话间隔 4 小时以上、每天最多 2 条、每轮全局一个会话），判断标准硬编码。0.2.0 加作息感知：深夜 23 点到 7 点半不主动开口（温度 0.9 以上才放行轻声模板），清晨换晨间语气。
 author: soapbot-plugins
 trust: community
 channel: community
