@@ -1,5 +1,5 @@
 name: sticker-album
-version: 0.1.1
+version: 0.2.0
 entry: main:StickerAlbumPlugin
 description: 机器人自己的表情包与照片相册。meme-save 从 URL 抓图（图床域名需在 http 允许列表，宿主沙箱禁重定向限 2MiB），base64 存插件加密 storage（100 张上限）；meme-send 经 send_media 能力发到发起命令的会话（宿主 ledger 校验加独立审批加 4MiB 上限）；meme-forget 确认后全清。
 author: soapbot-plugins
@@ -8,6 +8,7 @@ channel: community
 min_host_version: 0.1.0
 capabilities:
   - command
+  - media_observe
   - http
   - storage
   - send_media

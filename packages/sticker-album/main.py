@@ -2,10 +2,11 @@
 
 存储走插件加密 storage（base64 + 标签），发送走宿主的 ``send_media`` 能力面
 （与 send 同一套 observed-session ledger + 独立审批 + 4 MiB 双边界上限）。
-三个刻意的限制：
+两个刻意的限制：
 
-* 来源只有 URL——「从聊天里顺手收藏」需要消息钩子暴露图片段，宿主还没有这个面
-  （见 main 仓库 docs/qq-autonomy-design.md §5），先不做。
+* 来源两条路：URL 抓取（/meme-save，图床域名需在 http 允许列表）与**聊天里
+  顺手收藏**（/meme-keep，经 media_observe 取当前消息里的图片引用——宿主
+  #46 的能力面，URL 一次性给出，必须立刻入库）；
 * 上限 100 张：相册是「顺手能用」，不是图床；总量封顶防止 storage 无界膨胀。
 * 标签必须显式：没有标签的图检索不到，存了等于没存。
 
@@ -14,14 +15,17 @@
 | 命令 | 作用 |
 |---|---|
 | `/meme-save <URL> <标签...>` | 抓图入册（图床域名需在 http 允许列表） |
+| `/meme-keep <标签...>` | 把刚收到的消息里的图片顺手收进相册 |
 | `/meme-list [标签]` | 列出（可按标签过滤） |
 | `/meme-send <标签> [说明]` | 发一张到当前会话 |
+| `/meme-rm <编号>` | 删一张 |
 | `/meme-forget 确认` | 全清 |
 
 ## 能力与边界
 
 | 能力 | 用途 | 收窄 |
 |---|---|---|
+| `media_observe` | 取当前消息的图片引用（一次性、即时消费） | 宿主只给 http(s) 引用，会话由宿主绑定 |
 | `http` | 只 GET /meme-save 传入的图 URL | 宿主白名单 + 禁重定向 + 2MiB 响应上限 |
 | `storage` | base64 图 + 标签（加密，≤100 张） | 不出插件命名空间 |
 | `send_media` | 发图 | 宿主 ledger + 独立审批 + 4MiB 双边界上限 |
@@ -48,7 +52,7 @@ class StickerAlbumPlugin(Plugin):
         @ctx.command("meme-save", description="抓一张图进相册并打标签", usage="/meme-save <图片URL> <标签...>")
         async def meme_save(caller: CallerContext, args: list[str]) -> str:
             if len(args) < 2:
-                return "用法：/meme-save <图片URL> <标签...>（至少一个标签）"
+                return "用法：/meme-save <图片URL> <标签...>"
             url = args[0]
             if not url.lower().startswith(("http://", "https://")):
                 return "URL 要以 http(s):// 开头。"
@@ -59,19 +63,40 @@ class StickerAlbumPlugin(Plugin):
                 return f"抓取失败：{exc}（图床域名可能不在 http 允许列表里）"
             if status != 200:
                 return f"图床返回 HTTP {status}。"
-            if len(body) > 3 * 1024 * 1024:
-                return f"图片 {len(body) // 1024} KiB，超过 3 MiB 的入库上限。"
+            return await _store(ctx, body, tags)
+
+        @ctx.command("meme-keep", description="把刚收到的消息里的图片顺手收进相册",
+                     usage="/meme-keep <标签...>")
+        async def meme_keep(caller: CallerContext, args: list[str]) -> str:
+            tags = [t.strip() for t in args if t.strip()]
+            if not tags:
+                return "用法：/meme-keep <标签...>"
+            refs = await ctx.observe_images()
+            if not refs:
+                return "刚才那条消息里没有图片。"
+            kept = 0
             album = ctx.storage.get(ALBUM_KEY) or {}
-            if len(album) >= MAX_ITEMS:
-                return f"相册已满（{MAX_ITEMS} 张），先 /meme-rm 腾位置。"
-            item_id = uuid.uuid4().hex[:10]
-            album[item_id] = {
-                "b64": base64.b64encode(body).decode("ascii"),
-                "tags": tags,
-                "saved_at": time.time(),
-            }
+            for ref in refs:
+                url = str(ref.get("url") or "")
+                if not url:
+                    continue
+                try:
+                    status, body = await ctx.http.fetch(url, headers={"User-Agent": UA})
+                except (PermissionError, RuntimeError, ValueError):
+                    continue  # 单张失败不放弃其余的
+                if status != 200 or len(body) > 3 * 1024 * 1024:
+                    continue
+                if len(album) >= MAX_ITEMS:
+                    return f"相册已满（{MAX_ITEMS} 张）。已收 {kept} 张。"
+                item_id = uuid.uuid4().hex[:10]
+                album[item_id] = {
+                    "b64": base64.b64encode(body).decode("ascii"),
+                    "tags": tags,
+                    "saved_at": time.time(),
+                }
+                kept += 1
             ctx.storage.set(ALBUM_KEY, album)
-            return f"已入册（#{item_id}，标签：{'、'.join(tags)}）。相册 {len(album)} 张。"
+            return f"已收 {kept} 张（相册共 {len(album)} 张，标签：{'、'.join(tags)}）。"
 
         @ctx.command("meme-list", description="列出相册（可按标签过滤）", usage="/meme-list [标签]")
         async def meme_list(caller: CallerContext, args: list[str]) -> str:
@@ -105,7 +130,7 @@ class StickerAlbumPlugin(Plugin):
             await ctx.send_media(
                 session_key=caller.session_key,
                 image_b64=item["b64"],
-                caption=caption or f"[{tag}]",
+                caption=caption,
             )
             return ""
 
@@ -127,3 +152,16 @@ class StickerAlbumPlugin(Plugin):
             ctx.storage.set(ALBUM_KEY, {})
             return "相册已清空。"
 
+
+async def _store(ctx: PluginContext, body: bytes, tags: list[str]) -> str:
+    album = ctx.storage.get(ALBUM_KEY) or {}
+    if len(album) >= MAX_ITEMS:
+        return f"相册已满（{MAX_ITEMS} 张），先 /meme-rm 腾位置。"
+    item_id = uuid.uuid4().hex[:10]
+    album[item_id] = {
+        "b64": base64.b64encode(body).decode("ascii"),
+        "tags": tags,
+        "saved_at": time.time(),
+    }
+    ctx.storage.set(ALBUM_KEY, album)
+    return f"已入册（#{item_id}，标签：{'、'.join(tags)}）。相册 {len(album)} 张。"
