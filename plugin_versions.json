@@ -179,6 +179,13 @@
         "digest": "sha256:da2a0f9807fb36b3b96a86a01973d4de9ddb4a392f181c6063323aa6ea0b5477",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/auto-chat-0.2.0/auto-chat-0.2.0.zip"
+      },
+      {
+        "version": "0.3.0",
+        "released_at": "2026-11-12",
+        "digest": "sha256:8b1f452831bd45872ec4c9f413515b64c130d99bde4c43696b0a1b162ddbbb11",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/auto-chat-0.3.0/auto-chat-0.3.0.zip"
       }
     ],
     "sticker-album": [
@@ -195,6 +202,13 @@
         "digest": "sha256:b45cfe832b83de676fcf06c191b6e79eddf7de747e616b04edaa6d89ab8594a4",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/sticker-album-0.1.1/sticker-album-0.1.1.zip"
+      },
+      {
+        "version": "0.2.0",
+        "released_at": "2026-11-12",
+        "digest": "sha256:7cdd0a228de9ed5c09d742193aaff64f13ee7c81a969e270a1d5b46c53da45d5",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/sticker-album-0.2.0/sticker-album-0.2.0.zip"
       }
     ],
     "meme-wiki": [
