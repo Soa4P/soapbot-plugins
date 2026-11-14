@@ -1,0 +1,13 @@
+name: memory-weekly
+version: 0.1.0
+entry: main:MemoryWeeklyPlugin
+description: 记忆回顾：消息钩子攒本周话题片段（前 100 字符、14 天过期），/memweek 用它们逐个走宿主记忆召回（memory_read，会话键由宿主绑定），按记忆 id 去重整理成「这周聊到的、还记得的事」。改编自 dsh-fish-memory 与 private_companion 的记忆反思；淡忘半衰期与事实键 latest-wins 是宿主记忆层的设计输入（插件只读召回，无时间戳就不编造时间感）。无模型调用。
+author: soapbot-plugins
+trust: community
+channel: community
+min_host_version: 0.1.0
+capabilities:
+  - command
+  - message
+  - storage
+  - memory_read

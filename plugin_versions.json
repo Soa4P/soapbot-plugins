@@ -186,6 +186,13 @@
         "digest": "sha256:8b1f452831bd45872ec4c9f413515b64c130d99bde4c43696b0a1b162ddbbb11",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/auto-chat-0.3.0/auto-chat-0.3.0.zip"
+      },
+      {
+        "version": "0.4.0",
+        "released_at": "2026-11-14",
+        "digest": "sha256:ad24c46e794296e957ae0cb8804af630349c966f8ae7f3f5caa40ba91fb78f3b",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/auto-chat-0.4.0/auto-chat-0.4.0.zip"
       }
     ],
     "sticker-album": [
@@ -219,6 +226,25 @@
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/meme-wiki-0.1.0/meme-wiki-0.1.0.zip"
       }
+    ],
+    "mood-diary": [
+      {
+        "version": "0.1.0",
+        "released_at": "2026-11-14",
+        "digest": "sha256:36bb6fe6545b597cc93a85fbf4dede63e561ac4542573e797be3b5cc5ab24d87",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/mood-diary-0.1.0/mood-diary-0.1.0.zip"
+      }
+    ],
+    "memory-weekly": [
+      {
+        "version": "0.1.0",
+        "released_at": "2026-11-14",
+        "digest": "sha256:91ef5c0b19b8c3d4bc16298396b0b99d9d92527625322b500b27f3106ed34c46",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/memory-weekly-0.1.0/memory-weekly-0.1.0.zip"
+      }
     ]
-  }
+  },
+  "updated_at": "2026-11-14"
 }

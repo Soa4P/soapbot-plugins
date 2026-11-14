@@ -100,7 +100,7 @@
     },
     "auto-chat": {
       "summary": "在被开启的会话里偶尔自己开口。",
-      "description": "autochat-set 开启后，消息钩子按会话攒话题片段（前 120 字符，原文不落盘）与交互计数；cron 每 30 分钟挑一个温度达阈、过冷却（≥4 小时、每天 ≤2 条）的会话，用片段套固定模板开口经 send 投回原会话。温度公式确定性：log1p(近7天交互)/log1p(200) × 半衰 7 天的时间衰减。无模型调用。",
+      "description": "autochat-set 开启后，消息钩子按会话攒话题片段（前 120 字符，原文不落盘）与交互计数；cron 每 30 分钟挑一个温度达阈、过冷却（≥4 小时、每天 ≤2 条）的会话，先过本地掷骰（峰时命中线 60%/谷时 20%，连败补偿 +10 上限 +40，命中清零——零 token 的机械感抑制），用片段套固定模板开口经 send 投回原会话；开口用过的话题立即退役（问过即退，不机械追问）。/autochat-dry 与真发同源演练（不发送不推进计数）。温度公式确定性：log1p(近7天交互)/log1p(200) × 半衰 7 天的时间衰减。无模型调用。0.4.0 改编自 dsh-speak-up 与 private_companion。",
       "capabilities": [
         "command",
         "message",
@@ -135,6 +135,31 @@
       ],
       "requires": [],
       "readme": "packages/meme-wiki/README.md"
+    },
+    "mood-diary": {
+      "summary": "心情日记：每晚由当日交互统计推基调，/mood 查看最近七天，纪念日主动一句。",
+      "description": "mood-on 开启后，消息钩子按会话记当日交互数与短片段（前 60 字符、≤5 条，原文不落盘）；每晚 21:50 cron 由当日条数确定性分档基调（≥15 开心 / 6-14 热闹 / 1-5 平静 / 0 想念），写入插件加密 storage 时间线（≤30 天）；基调极端（开心/想念）时主动一句（每日 ≤1 条，只发显式开启的会话）；第一次对话的周年当天主动一句（年份标记防重）。/mood 查看最近七天，/mood-forget 清空。改编自 dsh-feiyu-mood（模型判心情 + prompt 注入）：走 soapbot 自己的路——心情是事后日记，不进 prompt 权威（宿主温度管关系亲疏，这里管当日热闹程度），无模型调用。",
+      "capabilities": [
+        "command",
+        "message",
+        "cron",
+        "storage",
+        "send"
+      ],
+      "requires": [],
+      "readme": "packages/mood-diary/README.md"
+    },
+    "memory-weekly": {
+      "summary": "记忆回顾：/memweek 用本周话题召回宿主记忆，整理成「这周还记得的事」。",
+      "description": "消息钩子攒本周话题片段（前 100 字符、≤20 条、14 天过期，原文不落盘）；/memweek 用片段逐个走宿主 memory.recall（memory_read、每次调用重查能力、会话范围由宿主 caller 决定），按记忆 id 去重，最多 12 条，输出附「因 N 天前聊到 XX 想起」——时间感只来自钩子时间戳，召回结果无时间戳就不编造。无 cron 推送（跨会话召回无 caller 会被宿主拒绝），回顾由会话里的人主动触发。改编自 dsh-fish-memory：淡忘半衰期与事实键 latest-wins 登记为宿主记忆层设计输入。无模型调用、无网络出站。",
+      "capabilities": [
+        "command",
+        "message",
+        "storage",
+        "memory_read"
+      ],
+      "requires": [],
+      "readme": "packages/memory-weekly/README.md"
     }
   }
 }
