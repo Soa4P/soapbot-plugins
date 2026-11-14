@@ -69,3 +69,27 @@ bundle），soapbot 插件跑在 `python -I` 子进程里、每个能力都要�
 - 发版流程见 VERSIONING.md：打 zip → GitHub Release（`<name>-<version>`）→ 把真实
   SHA-256 回填 `plugin_versions.json`。在回填之前，这些索引条目是**草稿**（占位
   digest），安装器会拒绝占位 digest 的版本。
+
+## 第五批改编（2026-11-15，六个参考仓库）
+
+| 参考仓库 | 一句话 | 状态 | 改编落点 |
+|---|---|---|---|
+| [menglimi/astrbot_plugin_private_companion](https://github.com/menglimi/astrbot_plugin_private_companion) | 一站式拟人陪伴（生活状态/日程/主动联系/关系网/七能力） | ⛔ 整体 / ✅ 思想三处并入 | 本体级套件的积木 soapbot 全都有宿主对应物（温度、多端对话、审批、screen 面）。本轮吸收三件：①「话题问过即退」并入 auto-chat 0.4.0（未完话头 48h 语义复核的确定性版：插件无模型面，用问过即退 + 片段池换血实现「不机械追问」）；②「每日反思提取互动纪念日」并入新包 mood-diary 0.1.0（周年主动一句，年份标记防重）；③「固定拟人策略合并单条 system 保 Prompt Cache」与主仓库 #70 增量折叠同源，登记为宿主 prompt-cache 设计输入 |
+| [CixiSVesper/dsh-soundtry](https://github.com/CixiSVesper/dsh-soundtry) | 本地音频理解（转写/BPM/和弦，faster-whisper + onnx，零 torch） | ⛔ | 宿主已有 transcribe 槽（语音消息走 Provider）；插件自带 2.4GB 依赖栈（隔离 venv + 模型下载）违背安装器轻量哲学与「六类攻击防护」的审查面。吸收两条原则进改编纪律：①诚实性输出（BPM ambiguous/level/conflict 三态、置信度自报——本批 memory-weekly「召回无时间戳就不编造时间感」即此原则的落法）；②依赖 doctor 自检模式（若将来有重型包，先出 doctor 再出功能） |
+| [Yuuyuko-uu/dsh-qq-link](https://github.com/Yuuyuko-uu/dsh-qq-link) | DSH ↔ QQ 双向桥（OneBot HTTP 轮询/富消息转写/戳一戳） | ⛔ | soapbot 本体就是 QQ 适配器，桥是整个产品不是插件。三条宿主设计输入登记：①戳一戳（notice 事件）进管线供插件钩子；②B 站分享卡片提取 BV 喂 bilibili 面；③「点名后接着听 N 条」的注意力窗口。富消息转写（合并转发展开/表情占位映射）属消息内容规范化，宿主适配器职责 |
+| [Yuuyuko-uu/dsh-feiyu-mood](https://github.com/Yuuyuko-uu/dsh-feiyu-mood) | 模型每轮判心情（七根情绪 + 注入 systemPrompt.context） | ⛔ 注入 / ✅ 日记式改编 | 两条立场冲突：①模型写入的持久状态是 #53 已拒绝的形状（写入权只在宿主管线）；②每轮 prompt 注入破坏「插件状态不进 prompt 权威」边界。改编落点是新包 **mood-diary 0.1.0**：心情是**事后日记**（每晚由当日交互统计确定性分档），存插件 storage、/mood 查看、不注入。与宿主温度互补：温度管关系亲疏，日记管当日热闹程度。feiyu 的「分口径判断（user/speak-up/cron）/ 可信度门槛 / 半衰回归」是好设计，若宿主将来开放定时语义任务能力可升级为模型判日记 |
+| [Yuuyuko-uu/dsh-speak-up](https://github.com/Yuuyuko-uu/dsh-speak-up) | 本地掷骰主动搭话（峰谷命中线 + 连败补偿 + 演练） | ✅ 并入 `auto-chat` 0.4.0 | 掷骰零 token 解决「温度达标就必开口」的机械感；峰谷表（工作日 9-12/14-18 峰时 60%、其余 20%）、连败补偿 +10 上限 +40、命中清零，全部写死。dsh 用 agent.followup，本仓库没有「代理一轮」的插件面——开口仍是模板 + 话题片段。**演练命令 /autochat-dry**（与真发同源、不发送不推进计数）照搬其「演练一次绝不真发」 |
+| [Yuuyuko-uu/dsh-fish-memory](https://github.com/Yuuyuko-uu/dsh-fish-memory) | 会淡忘的长期记忆（半衰期/证据召回/事实键/每日配额） | ⛔ 插件版 / 🚧 宿主设计输入 / ✅ 回顾改编 | 召回权在宿主：插件只有 memory.recall（无全量列举/按时间过滤），淡忘半衰期与事实键 latest-wins 做不了——登记为宿主记忆层设计输入（L2 淡忘半衰期按重要度分档、事实键「对象.方面」latest-wins、每日提炼配额）。插件侧改编为新包 **memory-weekly 0.1.0**：/memweek 用本周话题逐个召回、按记忆 id 去重产出「这周聊到的、还记得的事」；召回无时间戳就不编造时间感（soundtry 诚实性原则），时间感只来自钩子攒话题的时间戳 |
+
+## 第五批边界核对
+
+1. **出站目的地**：本批三个包零新增出站——auto-chat/mood-diary 只经 `send` 投回
+   显式开启的会话，memory-weekly 只走宿主 `memory.recall`（无网络）。soundtry 的
+   模型下载 URL 不改编即不存在。
+2. **随机数**：auto-chat 0.4.0 的掷骰用 `random.randint`——刻意非密码学随机：
+   它是「避免机械感」的心情骰子，不是密钥或防重凭据；峰谷表与连败参数写死。
+3. **无模型调用**：三个包都不含模型路径（mood-diary 的心情是确定性分档，feiyu 的
+   「模型判心情」需宿主定时语义任务能力，登记升级路径不偷跑）。
+4. **无写入**：零写入立场不变（B 站、QQ 空间、第三方全部只读或不触）。
+5. **cron 主动发言的收窄**：auto-chat 与 mood-diary 的 send 目标都是显式开启的
+   会话白名单（/autochat-set、/mood-on），每日 ≤2/≤1 条，全局每轮各挑一个会话。

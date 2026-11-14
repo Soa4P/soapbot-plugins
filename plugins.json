@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-13",
+  "updated_at": "2026-11-15",
   "note": "Discovery only. Listing a plugin here does not approve it, does not vouch for it, and does not install it. soapbot fetches this file to answer 'does a newer version exist', and every install still goes through local upload, local approval and a digest check.",
   "plugins": [
     {
@@ -105,14 +105,15 @@
     },
     {
       "name": "auto-chat",
-      "latest": "0.3.0",
+      "latest": "0.4.0",
       "versions": [
         "0.1.0",
         "0.1.1",
         "0.2.0",
-        "0.3.0"
+        "0.3.0",
+        "0.4.0"
       ],
-      "summary": "在被开启的会话里偶尔自己开口：温度阈值 + 频率硬上限 + 话题片段开口。",
+      "summary": "在被开启的会话里偶尔自己开口：温度阈值 + 频率硬上限 + 话题片段 + 本地掷骰（峰谷/连败补偿）+ 话题问过即退。",
       "author": "Soa4P",
       "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/auto-chat",
       "repository": "https://github.com/Soa4P/soapbot-plugins"
@@ -139,6 +140,28 @@
       "summary": "网络梗词典：查梗、自建词条、同步 cnmeme.wiki 词库。改编自 dsh-memewiki。",
       "author": "Soa4P",
       "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/meme-wiki",
+      "repository": "https://github.com/Soa4P/soapbot-plugins"
+    },
+    {
+      "name": "mood-diary",
+      "latest": "0.1.0",
+      "versions": [
+        "0.1.0"
+      ],
+      "summary": "心情日记：每晚由当日交互统计推基调（开心/热闹/平静/想念），/mood 查看最近七天，纪念日主动一句。改编自 dsh-feiyu-mood。",
+      "author": "Soa4P",
+      "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/mood-diary",
+      "repository": "https://github.com/Soa4P/soapbot-plugins"
+    },
+    {
+      "name": "memory-weekly",
+      "latest": "0.1.0",
+      "versions": [
+        "0.1.0"
+      ],
+      "summary": "记忆回顾：/memweek 用本周话题逐个召回宿主记忆，按 id 去重整理成「这周还记得的事」。改编自 dsh-fish-memory。",
+      "author": "Soa4P",
+      "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/memory-weekly",
       "repository": "https://github.com/Soa4P/soapbot-plugins"
     }
   ]
