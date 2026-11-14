@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-15",
+  "updated_at": "2026-11-14",
   "note": "Discovery only. Listing a plugin here does not approve it, does not vouch for it, and does not install it. soapbot fetches this file to answer 'does a newer version exist', and every install still goes through local upload, local approval and a digest check.",
   "plugins": [
     {
