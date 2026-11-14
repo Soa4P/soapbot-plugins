@@ -260,7 +260,16 @@
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/qzone-composer-0.1.0/qzone-composer-0.1.0.zip"
       }
+    ],
+    "novel-desk": [
+      {
+        "version": "0.1.0",
+        "released_at": "2026-11-15",
+        "digest": "sha256:1706ab2efb5891385ccfb4d08d6cf7826f4e1a5e2601d6165e297d9d798429fe",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/novel-desk-0.1.0/novel-desk-0.1.0.zip"
+      }
     ]
   },
-  "updated_at": "2026-11-14"
+  "updated_at": "2026-11-15"
 }
