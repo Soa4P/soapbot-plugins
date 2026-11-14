@@ -1,0 +1,15 @@
+name: qzone-composer
+version: 0.1.0
+entry: main:QzoneComposerPlugin
+description: QQ 空间素材草稿助手：每天 10:00 从 http 允许列表里的 RSS 源抓素材、确定性脱敏（QQ号/手机号/身份证/长数字串/路径/凭据形态，命中即弃）、起草一句话存插件加密 storage，提醒到开启的会话；发布必须人工 /qzc-confirm（三重确认的最后一道，qzone_write confirm=true）。改编自 kakamiku/dsh-qzone 的素材链路与脱敏 scrubber——但「自动发帖」不改编（与 A12 三重确认边界冲突），机器起草、人确认发布；写失败不自动重试（dsh-qzone 风控实测）。RSS 解析拒 DOCTYPE/ENTITY 并限输入大小。无模型调用。
+author: soapbot-plugins
+trust: community
+channel: community
+min_host_version: 0.1.0
+capabilities:
+  - command
+  - cron
+  - storage
+  - http
+  - send
+  - qzone_write
