@@ -73,8 +73,8 @@
       "readme": "packages/weather-alert/README.md"
     },
     "bili-scroll": {
-      "summary": "每天刷一轮 B 站热门并出摘要报告。",
-      "description": "bili-scroll-set 配置关注词后，每天 09:00 经 bilibili 能力拉热门列表（公开接口；配置了 SOAPBOT_BILI_COOKIE 则带登录态），按确定性规则（关注词命中 - 标题党标记）筛选最多 5 条，报告经 send 推到配置会话。只读：不点赞、不评论、不关注。已推荐 bvid 去重上限 500。",
+      "summary": "每天刷一轮 B 站，标题初筛 + 字幕原文加权判断。",
+      "description": "bili-scroll-set 配置关注词后，cron 每天 21:00（作息窗口 20-24 点，whale 克制思想）拉热门列表，标题/简介关键词命中减标题党标记做初筛；0.2.0 对初筛前 6 条经宿主字幕面（WBI 签名）取字幕原文、关注词命中加权（c1overzz 同名仓库「判断基于字幕原文而非摘要」的确定性版，无字幕/失败降级标题分）；日报「### BV号 + 为什么值得」格式经 send 推到配置会话；已推荐 bvid 去重上限 500；撞 412 半小时退避。零写入立场：不点赞不评论不关注。",
       "capabilities": [
         "command",
         "bilibili",
@@ -160,6 +160,22 @@
       ],
       "requires": [],
       "readme": "packages/memory-weekly/README.md"
+    },
+    "qzone-composer": {
+      "summary": "QQ 空间素材草稿助手：机器起草，人确认发布。",
+      "description": "qzc-set 开启后，cron 每天 10:00 从 http 允许列表里的 RSS 源抓素材（域名由操作者决定，插件不能自加源），确定性脱敏（QQ号/手机号/身份证/长数字串/路径/凭据形态，命中即弃——宁缺毋滥），起草一句话存插件加密 storage，提醒到开启的会话；发布必须人工 /qzc-confirm（宿主 qzone 网关三重确认的最后一道，qzone_write confirm=true）。写失败不自动重试（dsh-qzone 风控实测：票据会掉，重试是人的决定）。RSS 解析拒 DOCTYPE/ENTITY 并限 512KiB。改编自 kakamiku/dsh-qzone 的素材链路与脱敏 scrubber；「cron 自动发帖」不改编（与三重确认边界冲突）。无模型调用。",
+      "capabilities": [
+        "command",
+        "cron",
+        "storage",
+        "http",
+        "send",
+        "qzone_write"
+      ],
+      "requires": [
+        "宿主需配置 qzone（SOAPBOT_QZONE_VIA_PROTOCOL=true）并批准 qzone_write"
+      ],
+      "readme": "packages/qzone-composer/README.md"
     }
   }
 }

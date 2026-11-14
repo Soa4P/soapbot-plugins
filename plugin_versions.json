@@ -133,6 +133,13 @@
         "digest": "sha256:3b6467b166edab260f29fb4aef363690d09ab9c2763645dba9c20c21da152f19",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/bili-scroll-0.1.1/bili-scroll-0.1.1.zip"
+      },
+      {
+        "version": "0.2.0",
+        "released_at": "2026-11-14",
+        "digest": "sha256:6260b1790d51cdad1321dc05ed9b9dc2d3b1bf4e3c79b0fad8ff1f021837780f",
+        "min_host_version": "0.2.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/bili-scroll-0.2.0/bili-scroll-0.2.0.zip"
       }
     ],
     "fishtalk-lite": [
@@ -243,6 +250,15 @@
         "digest": "sha256:91ef5c0b19b8c3d4bc16298396b0b99d9d92527625322b500b27f3106ed34c46",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/memory-weekly-0.1.0/memory-weekly-0.1.0.zip"
+      }
+    ],
+    "qzone-composer": [
+      {
+        "version": "0.1.0",
+        "released_at": "2026-11-14",
+        "digest": "sha256:a3978e39e67391a616b2fbe2b3265c566c911e0e168dbe1464a61dc3f73bfe80",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/qzone-composer-0.1.0/qzone-composer-0.1.0.zip"
       }
     ]
   },

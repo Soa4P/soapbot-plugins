@@ -80,12 +80,13 @@
     },
     {
       "name": "bili-scroll",
-      "latest": "0.1.1",
+      "latest": "0.2.0",
       "versions": [
         "0.1.0",
-        "0.1.1"
+        "0.1.1",
+        "0.2.0"
       ],
-      "summary": "每天刷一轮 B 站热门，按关注词筛选出摘要报告推给你（只读，不写 B 站）。",
+      "summary": "每天刷一轮 B 站：标题初筛 + 字幕原文加权判断（宿主字幕面），日报「### BV号 + 为什么值得」推给你。只读，不点赞不评论不关注。",
       "author": "Soa4P",
       "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/bili-scroll",
       "repository": "https://github.com/Soa4P/soapbot-plugins"
@@ -162,6 +163,17 @@
       "summary": "记忆回顾：/memweek 用本周话题逐个召回宿主记忆，按 id 去重整理成「这周还记得的事」。改编自 dsh-fish-memory。",
       "author": "Soa4P",
       "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/memory-weekly",
+      "repository": "https://github.com/Soa4P/soapbot-plugins"
+    },
+    {
+      "name": "qzone-composer",
+      "latest": "0.1.0",
+      "versions": [
+        "0.1.0"
+      ],
+      "summary": "QQ 空间素材草稿助手：每天从允许列表 RSS 抓素材、脱敏起草一句话，提醒后人工 /qzc-confirm 发布（三重确认最后一道）。改编自 dsh-qzone，不自动发帖。",
+      "author": "Soa4P",
+      "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/qzone-composer",
       "repository": "https://github.com/Soa4P/soapbot-plugins"
     }
   ]

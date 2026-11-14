@@ -1,0 +1,25 @@
+新增: 第六批改编——bili-scroll 0.2.0 字幕原文加权、qzone-composer 0.1.0 素材草稿助手
+
+六个参考仓库（tts-bridge / c1overzz bili-scroll / grow 0.3.x / qq-dsh-bridge /
+kakamiku qzone / soul），逐仓对照改写，不照抄；六仓决策与设计输入登记见
+ADAPTATION.md 第六批。
+
+- bili-scroll 0.2.0：第一批登记的「字幕原文判断待字幕面」解除（#52 落地）——
+  标题初筛前 6 条经宿主字幕面取字幕原文加权（关注词命中 +2），无字幕/失败降级
+  标题分（原仓库降级链的如实终点）；日报改「段首固定 ### BV号 + 为什么值得」。
+  自动评论仍不改编（零写入立场）。
+- qzone-composer 0.1.0（新包）：kakamiku/dsh-qzone 的素材链路与脱敏 scrubber
+  改编，但「cron 自动发帖」不改编（与 A12 三重确认边界冲突）——机器起草、人
+  确认发布：cron 每天 10:00 从 http 允许列表 RSS 抓素材、确定性脱敏（命中即弃）、
+  起草一句话提醒，发布必须人工 /qzc-confirm（qzone_write confirm=true）；
+  写失败不自动重试（其风控实测直接采纳为行为）；RSS 解析拒 DOCTYPE/ENTITY 并
+  限 512KiB（安全扫描拦下后补的加固）。
+- 四条宿主设计输入登记：①qq-dsh-bridge 的闲置边界压缩（活跃会话不折叠保 KV
+  cache，#70 增量折叠的下一步——压缩时机）；②grow 0.3.x 的漂移算法四件套/
+  阶段天花板/行为式注入/PII 闸门；③soul 的结构化记忆节点与受控演化影子试用
+  形态；④tts-bridge 的每条回复朗读键（多端 UI 待排期）。L4 selfNote 仅新会话
+  首次读的立场与本仓库一致。
+
+索引：plugins.json / plugin_details.json / plugin_versions.json 三处同步；
+bili-scroll-0.2.0 / qzone-composer-0.1.0 两个 zip 已打包，digest 为真实
+SHA-256（release 于合并后创建）。

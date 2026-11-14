@@ -4,10 +4,11 @@ Adapted from https://github.com/c1overzz/dsh-bili-scroll — the idea (search, r
 judge, report, @me) survives; the machinery does not. The original runs Whisper
 locally and writes comments; soapbot's version is *read-only* by design:
 
-* v1 pulls the public popular feed (no login state needed) and optional keyword
-  filtering; deep "read the transcript" judging (the original's core) needs the
-  WBI-signed player endpoint and is listed in ADAPTATION.md as future work rather
-  than half-shipped here.
+* 0.2.0 closes the "read the transcript" gap with the host's subtitle face
+  (WBI-signed, #52): the top-scored candidates get their subtitle text fetched and
+  keyword hits counted there — judgement now weighs what the video actually says,
+  not just the title. No subtitle (or fetch failure) degrades to the title score,
+  like c1overzz's chain degrades from transcript to storyboard frames to skip.
 * It never writes to Bilibili: no likes, no comments, no follows. The original's
   "leave a comment @me" step is a *send to the operator's session* instead.
 
@@ -41,6 +42,11 @@ WINDOW_END_HOUR = 24
 READ_BUDGET_PER_ROUND = 12
 RISK_BACKOFF_SECONDS = 1800
 CLICKBAIT_MARKERS = ["震惊", "竟然", "真相", "必看", "秒杀"]
+
+#: 0.2.0 字幕原文加权（c1overzz 的核心思想「判断基于字幕原文而非摘要」的确定性版）：
+#: 只对标题初筛的前 N 条取字幕（读预算内），字幕里关注词命一次 +2。
+SUBTITLE_JUDGE_TOP = 6
+SUBTITLE_HITS_WEIGHT = 2
 
 
 RISK_KEY = "risk_backoff_until"
