@@ -118,3 +118,23 @@ bundle），soapbot 插件跑在 `python -I` 子进程里、每个能力都要�
    dsh-qzone 的按人设写文案→固定句式模板）。
 5. **脱敏即弃**：qzone-composer 素材命中脱敏正则直接放弃（不是替换后照发）——
    宁缺毋滥，发布出去的话是拿操作者账号说的。
+
+## 第七批改编（2026-11-15，六个参考仓库，其中 c1overzz/dsh-bili-scroll 为第六批复核）
+
+| 参考仓库 | 一句话 | 状态 | 改编落点 |
+|---|---|---|---|
+| [conFess233/astrbot_plugin_prompt_order](https://github.com/conFess233/astrbot_plugin_prompt_order) | 前缀缓存稳定：提示词分区排序 + 稳定度统计 + dry_run 先行 | ⛔ 插件版 / ✅ 设计输入 | 注入点在管线（插件够不到），但三条原则与 #70/qq-dsh-bridge 同域且互补：①**缓存友好布局**（不变且常驻的放 SYSTEM 最前、每轮变化的放后、TOOLS 区在最前——增删工具让后面全部失效）；②**dry_run 先行**（先只统计不改写，积累数据再开启——任何改提示词布局的改动都应先出统计）；③**来源追踪**（钩子前后快照把每处改动归到具体插件名下——比「谁改了 prompt」的事后争论便宜）。三者登记为宿主 prompt 组装（RecallStage notes 顺序）的设计输入 |
+| [NeverENG/SeekMemory](https://github.com/NeverENG/SeekMemory) | 长期陪伴记忆内核（Source→Artifact→Recall、Dream 离线整理、三 ID 分离） | ⛔ 插件版 / ✅ 设计输入 | 全部机制需要宿主记忆写入。四条进设计：①**Dream 离线整理带预算**（每天 03:30 分类/强化/合并/遗忘，幂等断点续跑，batches≤12/calls≤12/tokens≤60k——A15-t6 定时语义任务的预算模板）；②**三 ID 严格分离**（session_id=运行 lane / speaker_id=参与者 / subject_key=跨会话记忆主体——与 A16 统一会话互补：subject_key 是「同一个人换端仍记得」的键）；③**证据闸门公式**（召回受 max(0.5, top_evidence×0.3) 约束、披露按 scope 与敏感度控制能说多少——vet_memory 与 recall 排序的扩充方向）；④**留存指数衰减 R(t)=exp(-t/S) + 形状加权**（point/span/pattern/rule——fish-memory 半衰期的精确化） |
+| [c1overzz/dsh-bili-scroll](https://github.com/c1overzz/dsh-bili-scroll) | （第六批已改编 `bili-scroll` 0.2.0） | ✅ 已改编，复核无新增量 | 未吸收项复核：MCP vendor（宿主已有 bilibili 面，不需要第二套）、峰谷优惠时段（DeepSeek 计费特定，与 providers 无关的插件不该写死）、章程 sha256（无模型提示词）、自动评论（零写入立场）。结论：0.2.0 已覆盖可改编面 |
+| [InariNGT-Ofiicial/jingyu-live2d-agent](https://github.com/InariNGT-Ofiicial/jingyu-live2d-agent) | 自然语言 → Live2D 动作时间线（VTS 热部署/编排即编译） | ⛔ | soapbot 无 Live2D/虚拟形象面；本地工作台形态与插件无关。**「编排即编译」登记为 screen 控制面的参考形态**：LLM 只收「动作要求 + 能力目录」文本（不上传资产）、输出计划经本地校验参数/时间/通道冲突、失败自动修正最多一次——与控制面的「动作白名单 + 本地校验」同构，且把「模型输出永远过本地校验」落成了可复用的流程 |
+| [mistnest/dsh-cuigengji-plugin](https://github.com/mistnest/dsh-cuigengji-plugin) | 小说工作台：设定按需检索 + 章节草稿（冰山比喻） | ✅ 新包 `novel-desk` 0.1.0 | 核心机制「AI 工具调用按需读设定」依赖宿主模型工具面——插件没有。确定性版：**作者自己用命令管**（/nd-card 设定卡、/nd-search 子串检索如实降级、/nd-ch 章节草稿自动存 3 版历史、/nd-stats 字数如实标注非 token）。storage-only 不进宿主 kb（小说设定私密，kb 是共享检索面）；情节画布/酒馆导入不做（UI 工程/生态绑定）。「模型按需读设定」登记为宿主 tools 设计输入 |
+| [yuanstarstar/dsh-launcher](https://github.com/yuanstarstar/dsh-launcher) | 游戏启动器框架（下载器/实例管理/附属启动器分离/brand-check） | ⛔ 待控制面 | 启动游戏需要进程能力——screen 控制面第二阶段（三前置未齐）的范围内，现在开工即违反自己立的规矩。三条登记为控制面参考：①**框架/附属分离**（本体零游戏词的 brand-check 思路，对应「插件不含平台专用代码」的审查面）；②下载器工程（多源测速/Range 分片/sha1/指数退避）作为将来资源下载的参考实现；③**进程树停止与早期失败探测**（P26 桌面壳的受控 spawn 同源，控制面沿用） |
+
+## 第七批边界核对
+
+1. **novel-desk 是本批唯一新包**：capability 仅 command + storage——无网络出站、
+   无模型调用、无 cron、无 send，面窄到不能再窄。
+2. **如实降级**：检索是子串不是语义；字数是字符不是 token——两处都写在命令返回
+   与 README 里（soundtry 诚实性原则第三处落法）。
+3. **私密优先**：设定与草稿存插件加密 storage 而非宿主 kb——kb 是共享检索面，
+   小说设定不想被别的会话召回。

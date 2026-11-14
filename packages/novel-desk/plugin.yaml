@@ -1,0 +1,11 @@
+name: novel-desk
+version: 0.1.0
+entry: main:NovelDeskPlugin
+description: 私密小说写作台：设定卡（人物/世界观/规则）与章节草稿都存插件加密 storage，/nd-search 子串检索、章节自动保存上一版（3 版历史）/nd-ch-undo 恢复、字数统计（字符数如实标注）。改编自 mistnest/dsh-cuigengji-plugin 的小说工作台——原仓库核心「AI 工具调用按需读设定」依赖宿主模型工具面，插件没有，故走确定性版（作者自己用命令管，「模型按需读设定」登记为宿主 tools 设计输入）。storage-only 不进宿主 kb（小说设定私密），无模型调用、无网络出站。
+author: soapbot-plugins
+trust: community
+channel: community
+min_host_version: 0.1.0
+capabilities:
+  - command
+  - storage

@@ -176,6 +176,16 @@
         "宿主需配置 qzone（SOAPBOT_QZONE_VIA_PROTOCOL=true）并批准 qzone_write"
       ],
       "readme": "packages/qzone-composer/README.md"
+    },
+    "novel-desk": {
+      "summary": "私密小说写作台：设定卡与章节草稿，storage-only。",
+      "description": "nd-card 管设定卡（人物/世界观/规则），nd-search 子串检索（「资料按需读取」的确定性版——原仓库的 AI 工具调用按需读设定依赖宿主模型工具面，插件没有，登记为宿主 tools 设计输入）；nd-ch 章节草稿自动保存上一版（3 版历史）/nd-ch-undo 恢复/nd-stats 字数统计（字符数如实标注非 token）。storage-only 不进宿主 kb（小说设定私密）；卡 ≤200、章 ≤100、单文本 ≤20k 字符。改编自 mistnest/dsh-cuigengji-plugin。无模型调用、无网络、无 cron。",
+      "capabilities": [
+        "command",
+        "storage"
+      ],
+      "requires": [],
+      "readme": "packages/novel-desk/README.md"
     }
   }
 }
