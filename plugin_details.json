@@ -186,6 +186,16 @@
       ],
       "requires": [],
       "readme": "packages/novel-desk/README.md"
+    },
+    "skill-tree": {
+      "summary": "学习追踪技能树：前置锁定、点亮即声明、进度导出导入。",
+      "description": "tree-add 建技能（必须/推荐前置分层；前置引用必须已存在；加前置当场 DFS 拒环）；tree-done 点亮（必须前置未齐硬拒绝，推荐前置只提示）；tree-undo 取消点亮并连带撤下游依赖（保守合并的镜像）；tree 看全树（已点亮/可点亮/锁定）；tree-progress 统计；tree-export/tree-import 导出导入（已有点亮不被导入覆盖）。树与进度存插件加密 storage（最多 300 技能），不进宿主 kb。改编自 zeroa234/cs-math-skill-tree——点亮只来自用户自己声明，无自动认定。无模型调用、无网络、无 cron。",
+      "capabilities": [
+        "command",
+        "storage"
+      ],
+      "requires": [],
+      "readme": "packages/skill-tree/README.md"
     }
   }
 }

@@ -186,6 +186,17 @@
       "author": "Soa4P",
       "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/novel-desk",
       "repository": "https://github.com/Soa4P/soapbot-plugins"
+    },
+    {
+      "name": "skill-tree",
+      "latest": "0.1.0",
+      "versions": [
+        "0.1.0"
+      ],
+      "summary": "学习追踪技能树：前置锁定、点亮即声明、进度导出导入（保守合并）。改编自 cs-math-skill-tree。",
+      "author": "Soa4P",
+      "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/skill-tree",
+      "repository": "https://github.com/Soa4P/soapbot-plugins"
     }
   ]
 }
