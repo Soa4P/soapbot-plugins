@@ -17,6 +17,8 @@
 
 ## 新插件的最低要求
 
+0. **从脚手架开始**。复制 `packages/_template/` 为你的插件名——`plugin.yaml`、`main.py`（含「读了什么 / 发到哪里 / 留不留副本」docstring 模板）与 README 都已就位。它不进索引，只是起点。
+
 1. **能装**。包必须是单个 zip，根目录只有一个 `plugin.yaml`，用 `soapbot` 的安装器能装上。提交前自己跑一遍：
 
    ```bash

@@ -1,0 +1,7 @@
+新增: 插件脚手架 _template——第三方作者的起点
+
+packages/_template/：plugin.yaml + main.py + README 三件模板。复制即起步：
+docstring 模板要求回答「读了什么 / 发到哪里 / 留不留副本」；能力最小化与
+无模型调用的判断标准写进注释。不进索引（索引校验只认声明过的名字）。
+
+CONTRIBUTING.md 的「新插件的最低要求」加第 0 步：从脚手架开始。

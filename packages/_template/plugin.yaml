@@ -1,0 +1,11 @@
+name: my-plugin
+version: 0.1.0
+entry: main:MyPlugin
+description: 一句话说明这个插件做什么、读了什么、发到哪里、留不留副本——写「提升体验」不算说明。
+author: your-name
+trust: community
+channel: community
+min_host_version: 0.1.0
+capabilities:
+  - command
+  - storage
