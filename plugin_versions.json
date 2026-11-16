@@ -269,7 +269,16 @@
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/novel-desk-0.1.0/novel-desk-0.1.0.zip"
       }
+    ],
+    "skill-tree": [
+      {
+        "version": "0.1.0",
+        "released_at": "2026-11-15",
+        "digest": "sha256:3abfc52814f23330a6052c9beecf805b53b8a5d4ba3b881c465ab832655cae7d",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/skill-tree-0.1.0/skill-tree-0.1.0.zip"
+      }
     ]
   },
-  "updated_at": "2026-11-14"
+  "updated_at": "2026-11-15"
 }

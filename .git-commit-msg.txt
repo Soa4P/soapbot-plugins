@@ -1,7 +1,19 @@
-新增: 插件脚手架 _template——第三方作者的起点
+新增: 第八批改编——skill-tree 0.1.0 学习追踪技能树（cs-math-skill-tree 改编）
 
-packages/_template/：plugin.yaml + main.py + README 三件模板。复制即起步：
-docstring 模板要求回答「读了什么 / 发到哪里 / 留不留副本」；能力最小化与
-无模型调用的判断标准写进注释。不进索引（索引校验只认声明过的名字）。
+三个参考仓库（Coopanion / cs-math-skill-tree / dsh-see-now 复核），逐仓对照改写；
+决策表见 ADAPTATION.md 第八批。
 
-CONTRIBUTING.md 的「新插件的最低要求」加第 0 步：从脚手架开始。
+- skill-tree 0.1.0（新包）：/tree-add 建技能（必须/推荐前置分层；前置引用必须
+  已存在；加前置当场 DFS 拒环）、/tree-done 点亮（必须前置未齐硬拒绝、推荐只
+  提示）、/tree-undo 连带撤下游（保守合并的镜像）、/tree 全树视图、/tree-export
+  与 /tree-import 保守合并（已有点亮不被覆盖）。树与进度存插件加密 storage
+  （不超过 300 技能），不进宿主 kb。无模型调用、无网络、无 cron。
+- Coopanion 整体不改编（桌面宠物是宿主壳/UI 工程），三条设计输入进 screen 控制
+  面第二阶段（授权档位表 / 用户输入即暂停 / 每唤醒 40 请求上限）——主仓库
+  autonomous-capabilities-design.md 1.7 已登记。
+- dsh-see-now 复核：第一批改编的 screen 能力面已覆盖其核心（变化量筛帧/拼图/
+  只留最新/不落盘）；0.1.4+ 增量（region/scene 模式、声音通道、切点+积分判据）
+  登记为 screen 第二阶段设计输入。
+
+索引：plugins.json / plugin_details.json / plugin_versions.json 三处同步；
+skill-tree-0.1.0.zip 已打包，digest 为真实 SHA-256（release 于合并后创建）。
