@@ -22,6 +22,8 @@ from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
 
 TREE_KEY = "tree"        # {"skills": {id: {...}}, "done": {id: {"ts"}}}
+REVIEW_KEY = "review"     # {"session": ..., "days": 7, "reviewed": {id: ts}}
+REVIEW_REPEAT_DAYS = 7
 MAX_SKILLS = 300
 
 
@@ -193,6 +195,61 @@ class SkillTreePlugin(Plugin):
             tree["done"] = done
             ctx.storage.set(TREE_KEY, tree)
             return f"已导入：新增 {merged_new} 个技能；已有点亮保持不变（保守合并）。"
+
+        @ctx.command("tree-review-set", description="开启复习提醒（当前会话接收，默认每 7 天）",
+                     usage="/tree-review-set [天数]")
+        async def review_set(caller: CallerContext, args: list[str]) -> str:
+            days = 7
+            if args and args[0].isdigit():
+                days = max(1, min(int(args[0]), 90))
+            review = ctx.storage.get(REVIEW_KEY) or {}
+            review["session"] = caller.session_key
+            review["days"] = days
+            ctx.storage.set(REVIEW_KEY, review)
+            return f"复习提醒已开启（每 {days} 天）。会从点亮最早的技能开始提醒。"
+
+        @ctx.command("tree-review-off", description="关闭复习提醒", usage="/tree-review-off")
+        async def review_off(caller: CallerContext, args: list[str]) -> str:
+            review = ctx.storage.get(REVIEW_KEY) or {}
+            review.pop("session", None)
+            ctx.storage.set(REVIEW_KEY, review)
+            return "复习提醒已关闭。"
+
+        @ctx.cron("30 9 * * *", name="skill-tree-review")
+        async def review_tick() -> None:
+            review = ctx.storage.get(REVIEW_KEY) or {}
+            session = review.get("session")
+            if not session:
+                return
+            tree = ctx.storage.get(TREE_KEY) or {}
+            done = tree.get("done", {})
+            reviewed = review.get("reviewed", {})
+            import time as _t
+
+            now = _t.time()
+            repeat_cutoff = now - REVIEW_REPEAT_DAYS * 86400
+            candidates = [
+                (sid, meta.get("name", sid), done[sid].get("ts", 0))
+                for sid, meta in sorted(tree.get("skills", {}).items())
+                if sid in done and reviewed.get(sid, 0) < done[sid].get("ts", 0) - 86400
+            ]
+            candidates.sort(key=lambda pair: pair[2])  # 点亮最早优先
+            picks = [c for c in candidates if c[2] <= now - 86400][:3]
+            if not picks:
+                return
+            lines = [f"「{name}」（点亮于 {_t.strftime('%m-%d', _t.localtime(ts))}）"
+                     for _sid, name, ts in picks]
+            for sid, _name, _ts in picks:
+                reviewed[sid] = now
+            review["reviewed"] = reviewed
+            ctx.storage.set(REVIEW_KEY, review)
+            try:
+                await ctx.send(
+                    "复习提醒——这些你点亮得最早，还记得吗？\n" + "\n".join(lines),
+                    session_key=session,
+                )
+            except (PermissionError, RuntimeError, ValueError):
+                pass  # 发送失败：reviewed 已记，7 天后自然重提
 
         @ctx.command("tree-reset", description="清空整棵树（必须确认）", usage="/tree-reset 确认")
         async def tree_reset(caller: CallerContext, args: list[str]) -> str:

@@ -32,3 +32,13 @@
 | `storage` | 树与进度（加密） | 技能 ≤300；导出导入是显式命令 |
 
 无模型调用、无网络出站、无 cron、无 send。
+
+
+## 1.0.0：复习提醒（MAJOR——capabilities 加 cron/send）
+
+- `/tree-review-set [天数]`：开启当前会话的复习提醒（默认每 7 天）。
+- cron 每天 09:30：从点亮最早的技能里挑最多 3 条发提醒；提醒过的记 `reviewed`，
+  7 天内不重复提醒（发送失败也记，7 天后自然重提）。
+- `/tree-review-off`：关闭。
+
+capabilities 加 cron/send 是 MAJOR（VERSIONING.md 规则）→ 1.0.0。
