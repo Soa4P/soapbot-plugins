@@ -1,5 +1,5 @@
 name: meme-wiki
-version: 0.1.0
+version: 0.1.1
 entry: main:MemeWikiPlugin
 description: 网络梗词典：查梗、自建词条、按需同步词库。改编自 thawline 的 dsh-memewiki （词库源 cnmeme.wiki 公开接口），改为
   soapbot 命令式查询。读了什么：meme-sync 与 meme-search 向 cnmeme.wiki 的公开 API 发 GET（无凭据）；词条正文与别名存

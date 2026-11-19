@@ -55,6 +55,13 @@
         "digest": "sha256:6260b1790d51cdad1321dc05ed9b9dc2d3b1bf4e3c79b0fad8ff1f021837780f",
         "min_host_version": "0.2.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/bili-scroll-0.2.0/bili-scroll-0.2.0.zip"
+      },
+      {
+        "version": "0.2.1",
+        "released_at": "2026-11-19",
+        "digest": "sha256:dc2e35934eca2ed0ad1abb5f30f50406bb18b741912d7704599341c8d1fe6d25",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/bili-scroll-0.2.1/bili-scroll-0.2.1.zip"
       }
     ],
     "fishtalk-lite": [
@@ -115,6 +122,13 @@
         "digest": "sha256:ad24c46e794296e957ae0cb8804af630349c966f8ae7f3f5caa40ba91fb78f3b",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/auto-chat-0.4.0/auto-chat-0.4.0.zip"
+      },
+      {
+        "version": "0.4.1",
+        "released_at": "2026-11-19",
+        "digest": "sha256:051a34d327c91095464ad8dff137e61b9cfe37007ef28f803ae95a1fd6a8c316",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/auto-chat-0.4.1/auto-chat-0.4.1.zip"
       }
     ],
     "sticker-album": [
@@ -147,6 +161,13 @@
         "digest": "sha256:f085885f5bc6d6ea43b4ab7930a60fc91f2cf03193d2bace94235f094cbaae69",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/meme-wiki-0.1.0/meme-wiki-0.1.0.zip"
+      },
+      {
+        "version": "0.1.1",
+        "released_at": "2026-11-19",
+        "digest": "sha256:1e93e96bc2f8dc93c5be73642ce9b7f60043fa45cdb1db7763ee9f87dbc1f0b7",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/meme-wiki-0.1.1/meme-wiki-0.1.1.zip"
       }
     ],
     "mood-diary": [
@@ -156,6 +177,13 @@
         "digest": "sha256:36bb6fe6545b597cc93a85fbf4dede63e561ac4542573e797be3b5cc5ab24d87",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/mood-diary-0.1.0/mood-diary-0.1.0.zip"
+      },
+      {
+        "version": "0.1.1",
+        "released_at": "2026-11-19",
+        "digest": "sha256:b26f3eab31333d8fb925c61cca0c5202143ff34e9fafc5c16a45edd9643074c2",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/mood-diary-0.1.1/mood-diary-0.1.1.zip"
       }
     ],
     "memory-weekly": [
@@ -165,6 +193,13 @@
         "digest": "sha256:91ef5c0b19b8c3d4bc16298396b0b99d9d92527625322b500b27f3106ed34c46",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/memory-weekly-0.1.0/memory-weekly-0.1.0.zip"
+      },
+      {
+        "version": "0.1.1",
+        "released_at": "2026-11-19",
+        "digest": "sha256:53214bc0e52e3aabb61d32906cf78d6195a61bfd0be818b2e1baa6b7f977acbb",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/memory-weekly-0.1.1/memory-weekly-0.1.1.zip"
       }
     ],
     "qzone-composer": [
@@ -174,6 +209,13 @@
         "digest": "sha256:a3978e39e67391a616b2fbe2b3265c566c911e0e168dbe1464a61dc3f73bfe80",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/qzone-composer-0.1.0/qzone-composer-0.1.0.zip"
+      },
+      {
+        "version": "0.1.1",
+        "released_at": "2026-11-19",
+        "digest": "sha256:f48bdebcdf81bc45707a2eb972e41fdb983f61bed28c74951d8c15de2c83ca7c",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/qzone-composer-0.1.1/qzone-composer-0.1.1.zip"
       }
     ],
     "novel-desk": [
@@ -183,6 +225,13 @@
         "digest": "sha256:1706ab2efb5891385ccfb4d08d6cf7826f4e1a5e2601d6165e297d9d798429fe",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/novel-desk-0.1.0/novel-desk-0.1.0.zip"
+      },
+      {
+        "version": "0.1.1",
+        "released_at": "2026-11-19",
+        "digest": "sha256:7a7497d9b0d129bfefcfc7b3c19202ab0847143b9f5413a403f6491688ba9400",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/novel-desk-0.1.1/novel-desk-0.1.1.zip"
       }
     ],
     "skill-tree": [
@@ -199,6 +248,13 @@
         "digest": "sha256:61e90aa5751d521d18cfb6bb370853a916bda3d1b4cea746f561ab0d8076875a",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/skill-tree-1.0.0/skill-tree-1.0.0.zip"
+      },
+      {
+        "version": "1.0.1",
+        "released_at": "2026-11-19",
+        "digest": "sha256:a0d76d0730b9f1efb12c8882a98bce16d08027e7ef3dd1fbf3174b0ab2ded957",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/skill-tree-1.0.1/skill-tree-1.0.1.zip"
       }
     ],
     "weather": [

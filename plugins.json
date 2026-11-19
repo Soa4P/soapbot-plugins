@@ -29,11 +29,12 @@
     },
     {
       "name": "bili-scroll",
-      "latest": "0.2.0",
+      "latest": "0.2.1",
       "versions": [
         "0.1.0",
         "0.1.1",
-        "0.2.0"
+        "0.2.0",
+        "0.2.1"
       ],
       "summary": "每天刷一轮 B 站：标题初筛 + 字幕原文加权判断（宿主字幕面），日报「### BV号 + 为什么值得」推给你。只读，不点赞不评论不关注。",
       "author": "Soa4P",
@@ -55,13 +56,14 @@
     },
     {
       "name": "auto-chat",
-      "latest": "0.4.0",
+      "latest": "0.4.1",
       "versions": [
         "0.1.0",
         "0.1.1",
         "0.2.0",
         "0.3.0",
-        "0.4.0"
+        "0.4.0",
+        "0.4.1"
       ],
       "summary": "在被开启的会话里偶尔自己开口：温度阈值 + 频率硬上限 + 话题片段 + 本地掷骰（峰谷/连败补偿）+ 话题问过即退。",
       "author": "Soa4P",
@@ -83,9 +85,10 @@
     },
     {
       "name": "meme-wiki",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "versions": [
-        "0.1.0"
+        "0.1.0",
+        "0.1.1"
       ],
       "summary": "网络梗词典：查梗、自建词条、同步 cnmeme.wiki 词库。改编自 dsh-memewiki。",
       "author": "Soa4P",
@@ -94,9 +97,10 @@
     },
     {
       "name": "mood-diary",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "versions": [
-        "0.1.0"
+        "0.1.0",
+        "0.1.1"
       ],
       "summary": "心情日记：每晚由当日交互统计推基调（开心/热闹/平静/想念），/mood 查看最近七天，纪念日主动一句。改编自 dsh-feiyu-mood。",
       "author": "Soa4P",
@@ -105,9 +109,10 @@
     },
     {
       "name": "memory-weekly",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "versions": [
-        "0.1.0"
+        "0.1.0",
+        "0.1.1"
       ],
       "summary": "记忆回顾：/memweek 用本周话题逐个召回宿主记忆，按 id 去重整理成「这周还记得的事」。改编自 dsh-fish-memory。",
       "author": "Soa4P",
@@ -116,9 +121,10 @@
     },
     {
       "name": "qzone-composer",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "versions": [
-        "0.1.0"
+        "0.1.0",
+        "0.1.1"
       ],
       "summary": "QQ 空间素材草稿助手：每天从允许列表 RSS 抓素材、脱敏起草一句话，提醒后人工 /qzc-confirm 发布（三重确认最后一道）。改编自 dsh-qzone，不自动发帖。",
       "author": "Soa4P",
@@ -127,9 +133,10 @@
     },
     {
       "name": "novel-desk",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "versions": [
-        "0.1.0"
+        "0.1.0",
+        "0.1.1"
       ],
       "summary": "私密小说写作台：设定卡与章节草稿存加密 storage，/nd-search 检索设定、/nd-ch-undo 恢复旧稿。改编自 dsh-cuigengji-plugin。",
       "author": "Soa4P",
@@ -138,10 +145,11 @@
     },
     {
       "name": "skill-tree",
-      "latest": "1.0.0",
+      "latest": "1.0.1",
       "versions": [
         "0.1.0",
-        "1.0.0"
+        "1.0.0",
+        "1.0.1"
       ],
       "summary": "学习追踪技能树：前置锁定、点亮即声明、复习提醒（cron+send）。改编自 cs-math-skill-tree。",
       "author": "Soa4P",

@@ -1,5 +1,5 @@
 name: mood-diary
-version: 0.1.0
+version: 0.1.1
 entry: main:MoodDiaryPlugin
 description: 心情日记：每晚由当日交互统计推出基调（开心／热闹／平静／想念），写进插件加密 storage 的时间线；／mood 查看最近七天，纪念日当天主动一句。改编自
   dsh-feiyu-mood 与 private_companion 的「每日反思／纪念日」，走 soapbot 自己的路——心情是事后日记，不进 prompt
