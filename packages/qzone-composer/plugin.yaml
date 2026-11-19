@@ -1,5 +1,5 @@
 name: qzone-composer
-version: 0.1.0
+version: 0.1.1
 entry: main:QzoneComposerPlugin
 description: QQ 空间素材草稿助手：每天 10:00 从 http 允许列表里的 RSS 源抓素材、确定性脱敏（QQ号／手机号／身份证／长数字串／路径／凭据形态，命中即弃）、起草一句话存插件加密
   storage，提醒到开启的会话；发布必须人工 ／qzc-confirm（三重确认的最后一道，qzone_write confirm=true）。改编自 kakamiku／dsh-qzone
