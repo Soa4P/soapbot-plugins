@@ -1,0 +1,56 @@
+name: Reachability probe
+
+# AstrBot_Plugins_Collection（#95 参照）的 clean-unreachable 机制移植：索引里的
+# download URL 定期探测，失联的开 issue 给维护者——用户装不上的问题要在用户撞上
+# 之前被看见。探针只读不改索引：下架是显式决策，不是静默消失。
+
+on:
+  schedule:
+    - cron: "0 3 * * 1" # 每周一 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Probe latest download URLs
+        id: probe
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/check_reachability.py | tee probe-output.txt
+          if grep -q "个失联" probe-output.txt; then
+            echo "has_unreachable=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open an issue for unreachable releases
+        if: steps.probe.outputs.has_unreachable == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TITLE="updatepilot 索引巡检：有发布资产失联"
+          if gh issue list --label reachability --state open --json number --jq 'length' | grep -qv '^0$'; then
+            echo "已有开放的失联 issue，不重复创建。"
+            gh issue list --label reachability --state open --limit 1
+            exit 0
+          fi
+          gh issue create --title "$TITLE" --label reachability --body-file probe-output.txt
+
+      - name: Close stale reachability issues when clean
+        if: steps.probe.outputs.has_unreachable != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for n in $(gh issue list --label reachability --state open --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "本轮探测全部可达，失联已恢复。"
+          done
