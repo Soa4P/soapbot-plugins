@@ -1,0 +1,50 @@
+name: Plugin smoke validation
+
+# AstrBot_Plugins_Collection 的 validate-plugin-smoke 移植：PR 只测变更插件，
+# 每晚全量扫一遍——把列出的插件装进真宿主（soapbot.loader）确认可加载。
+# 索引一致性门禁（validate_index）管文件对得上；本 job 管「对得上的真能跑」。
+
+on:
+  pull_request:
+    paths:
+      - "packages/**"
+      - "scripts/smoke_validate.py"
+      - ".github/workflows/smoke-validate.yml"
+  schedule:
+    - cron: "30 4 * * *"
+  workflow_dispatch:
+    inputs:
+      plugins:
+        description: "逗号分隔的包目录名；空 = 全部"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 宿主从 soapbot master 安装：冒烟验证的是「当前宿主能否加载这些插件」，
+      # 插件作者不能选择宿主版本（那会把校验降级成自欺）。
+      - name: Install host (soapbot @ master)
+        run: pip install "soapbot @ git+https://github.com/Soa4P/soapbot.git@master"
+
+      - name: Detect changed plugins (PR only)
+        if: github.event_name == 'pull_request'
+        run: |
+          changed=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" HEAD -- packages/ \
+            | cut -d/ -f2 | sort -u | grep -v '^$' | tr '\n' ',' )
+          echo "PLUGINS=${changed%,}" >> "$GITHUB_ENV"
+
+      - name: Smoke
+        run: python scripts/smoke_validate.py --plugins "${{ env.PLUGINS || inputs.plugins || '' }}"
