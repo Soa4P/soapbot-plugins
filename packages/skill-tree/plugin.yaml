@@ -1,13 +1,15 @@
 name: skill-tree
 version: 1.0.0
 entry: main:SkillTreePlugin
-description: 学习追踪技能树（1.0.0 加复习提醒：cron+send，MAJOR）。/tree-add 建技能（必须/推荐前置分层，加前置当场拒环）、/tree-done 点亮（必须前置未齐硬拒绝、推荐只提示）、/tree 看全树、进度导出导入（保守合并：已有点亮不被覆盖）。改编自 zeroa234/cs-math-skill-tree 的证据先行与分层判定——点亮只来自用户自己声明，无自动认定；树与进度存插件加密 storage，不进宿主 kb。无模型调用、无网络、无 cron。
+description: 学习追踪技能树（1.0.0 加复习提醒：cron+send，MAJOR）。／tree-add 建技能（必须／推荐前置分层，加前置当场拒环）、／tree-done
+  点亮（必须前置未齐硬拒绝、推荐只提示）、／tree 看全树、进度导出导入（保守合并：已有点亮不被覆盖）。改编自 zeroa234／cs-math-skill-tree
+  的证据先行与分层判定——点亮只来自用户自己声明，无自动认定；树与进度存插件加密 storage，不进宿主 kb。无模型调用、无网络、无 cron。
 author: soapbot-plugins
 trust: community
 channel: community
-min_host_version: 1.0.0
+min_host_version: 0.1.0
 capabilities:
-  - command
-  - cron
-  - storage
-  - send
+- command
+- cron
+- send
+- storage
