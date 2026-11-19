@@ -7,6 +7,22 @@
       "last_version": "0.9.3",
       "archived_at": "2026-08-19",
       "reason": "上游图片接口已下线，作者不再维护。已安装的实例仍可运行，但不会再收到更新。"
+    },
+    {
+      "name": "weather",
+      "reason": "幻影条目：索引种子模板遗留，从未有实现/packages/release；2026-11-19 清理归档（封锁记录保留）。"
+    },
+    {
+      "name": "rss-digest",
+      "reason": "幻影条目：索引种子模板遗留，从未有实现/packages/release；2026-11-19 清理归档（封锁记录保留）。"
+    },
+    {
+      "name": "group-guard",
+      "reason": "幻影条目：索引种子模板遗留，从未有实现/packages/release；2026-11-19 清理归档（封锁记录保留）。"
+    },
+    {
+      "name": "kb-sync",
+      "reason": "幻影条目：索引种子模板遗留，从未有实现/packages/release；2026-11-19 清理归档（封锁记录保留）。"
     }
   ]
 }
