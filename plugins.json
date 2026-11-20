@@ -98,10 +98,11 @@
     },
     {
       "name": "mood-diary",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "versions": [
         "0.1.0",
-        "0.1.1"
+        "0.1.1",
+        "0.1.2"
       ],
       "summary": "心情日记：每晚由当日交互统计推基调（开心/热闹/平静/想念），/mood 查看最近七天，纪念日主动一句。改编自 dsh-feiyu-mood。",
       "author": "Soa4P",
@@ -110,10 +111,11 @@
     },
     {
       "name": "memory-weekly",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "versions": [
         "0.1.0",
-        "0.1.1"
+        "0.1.1",
+        "0.1.2"
       ],
       "summary": "记忆回顾：/memweek 用本周话题逐个召回宿主记忆，按 id 去重整理成「这周还记得的事」。改编自 dsh-fish-memory。",
       "author": "Soa4P",
@@ -155,6 +157,17 @@
       "summary": "学习追踪技能树：前置锁定、点亮即声明、复习提醒（cron+send）。改编自 cs-math-skill-tree。",
       "author": "Soa4P",
       "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/skill-tree",
+      "repository": "https://github.com/Soa4P/soapbot-plugins"
+    },
+    {
+      "name": "group-digest",
+      "latest": "0.1.0",
+      "versions": [
+        "0.1.0"
+      ],
+      "summary": "群活跃度统计：消息钩子攒每日与时段计数、活跃成员（只存计数不存文本，14 天滚动），／digest-now 现算概览，／digest-reset 清空。改编自 AstrBot 群分析总结的确定性残量。",
+      "author": "soapbot-plugins",
+      "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/group-digest",
       "repository": "https://github.com/Soa4P/soapbot-plugins"
     }
   ]

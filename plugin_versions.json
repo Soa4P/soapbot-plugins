@@ -191,6 +191,13 @@
         "digest": "sha256:b26f3eab31333d8fb925c61cca0c5202143ff34e9fafc5c16a45edd9643074c2",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/mood-diary-0.1.1/mood-diary-0.1.1.zip"
+      },
+      {
+        "version": "0.1.2",
+        "released_at": "2026-11-20",
+        "digest": "sha256:47f2f73b9ca44d0b9d444ad337571a951b03b18728d64a789b8dca88e0fb7684",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/mood-diary-0.1.2/mood-diary-0.1.2.zip"
       }
     ],
     "memory-weekly": [
@@ -207,6 +214,13 @@
         "digest": "sha256:53214bc0e52e3aabb61d32906cf78d6195a61bfd0be818b2e1baa6b7f977acbb",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/memory-weekly-0.1.1/memory-weekly-0.1.1.zip"
+      },
+      {
+        "version": "0.1.2",
+        "released_at": "2026-11-20",
+        "digest": "sha256:0364799df161439950dba06e5d1e51fa2fb266c55e8894c303e7359876600c54",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/memory-weekly-0.1.2/memory-weekly-0.1.2.zip"
       }
     ],
     "qzone-composer": [
@@ -347,6 +361,15 @@
         "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/kb-sync-0.1.0/kb-sync-0.1.0.zip"
+      }
+    ],
+    "group-digest": [
+      {
+        "version": "0.1.0",
+        "released_at": "2026-11-20",
+        "digest": "sha256:403d4109115c801a3d0633dc26b05eed59a7cec54c093c26558a92945f6dea97",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/group-digest-0.1.0/group-digest-0.1.0.zip"
       }
     ]
   },

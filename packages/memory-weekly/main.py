@@ -17,7 +17,7 @@
 
 from __future__ import annotations
 
-import datetime as dt
+import inspect
 import time
 
 from soapbot.plugins.base import Plugin
@@ -29,6 +29,20 @@ TOPICS_MAX = 20
 TOPIC_TTL_DAYS = 14
 RECALL_PER_TOPIC = 3
 DIGEST_MAX = 12
+
+
+async def sget(ctx: PluginContext, key: str, default=None):
+    """双模式存储读：进程内 sync / 隔离 worker async，同一份插件代码。"""
+    value = ctx.storage.get(key, default)
+    if inspect.isawaitable(value):
+        value = await value
+    return value
+
+
+async def sset(ctx: PluginContext, key: str, value) -> None:
+    result = ctx.storage.set(key, value)
+    if inspect.isawaitable(result):
+        await result
 
 
 def _now() -> float:
@@ -47,13 +61,15 @@ class MemoryWeeklyPlugin(Plugin):
         @ctx.on_message
         async def observe(caller: CallerContext, text: str) -> None:
             session = caller.session_key
-            topics = ctx.storage.get(TOPICS_KEY) or {}
+            if not session:
+                return
+            topics = await sget(ctx, TOPICS_KEY) or {}
             entries = _fresh(topics.get(session) or [])
             snippet = text.strip()[:TOPIC_CHARS]
             if snippet and all(snippet != e.get("text") for e in entries):
                 entries = (entries + [{"text": snippet, "ts": _now()}])[-TOPICS_MAX:]
                 topics[session] = entries
-                ctx.storage.set(TOPICS_KEY, topics)
+                await sset(ctx, TOPICS_KEY, topics)
 
         @ctx.command(
             "memweek",
@@ -64,7 +80,7 @@ class MemoryWeeklyPlugin(Plugin):
             if not ctx.memory.available:
                 return "宿主没有配置记忆层，回顾无从谈起。"
             session = caller.session_key
-            topics = _fresh((ctx.storage.get(TOPICS_KEY) or {}).get(session) or [])
+            topics = _fresh(((await sget(ctx, TOPICS_KEY)) or {}).get(session) or [])
             if not topics:
                 return "最近两周没有攒下话题。聊点什么，再来 /memweek。"
 
