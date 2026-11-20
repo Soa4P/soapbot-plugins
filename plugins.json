@@ -72,11 +72,12 @@
     },
     {
       "name": "sticker-album",
-      "latest": "0.2.0",
+      "latest": "1.0.0",
       "versions": [
         "0.1.0",
         "0.1.1",
-        "0.2.0"
+        "0.2.0",
+        "1.0.0"
       ],
       "summary": "机器人自己的表情包相册：存/按标签找/发出去（需 send_media 能力）。",
       "author": "Soa4P",

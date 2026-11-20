@@ -62,14 +62,29 @@ def main() -> int:
     import yaml
 
     manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
-    old_version = str(manifest.get("version") or "")
-    new_version = _bump(old_version)
-    manifest["version"] = new_version
-    manifest_path.write_text(
-        yaml.safe_dump(manifest, allow_unicode=True, sort_keys=False),
-        encoding="utf-8",
-    )
-    print(f"{name}: {old_version} -> {new_version}")
+    declared = str(manifest.get("version") or "")
+    index = _load("plugins.json")
+    latest = ""
+    for entry in index.get("plugins", []):
+        if entry.get("name") == name:
+            latest = str(entry.get("latest") or "")
+    # 版本语义：manifest 已声明一个未发布的新版本 → 按声明发布（如 1.0.0 MAJOR）；
+    # manifest 版本 == 索引 latest（已发布过）→ patch bump。两者之外拒绝（防手滑）。
+    if declared == latest:
+        new_version = _bump(declared)
+        manifest["version"] = new_version
+        manifest_path.write_text(
+            yaml.safe_dump(manifest, allow_unicode=True, sort_keys=False),
+            encoding="utf-8",
+        )
+        print(f"{name}: bump {latest} -> {new_version}")
+    elif declared and declared != latest:
+        new_version = declared
+        print(f"{name}: 按声明版本 {declared} 发布（索引 latest={latest}）")
+    else:
+        print(f"{name}: 版本缺失")
+        return 2
+    print(f"release version: {new_version}")
 
     dist = ROOT / ".release"
     dist.mkdir(exist_ok=True)
