@@ -151,6 +151,17 @@
       ],
       "requires": [],
       "readme": "packages/skill-tree/README.md"
+    },
+    "group-digest": {
+      "summary": "群活跃度统计：消息钩子攒每日与时段计数、活跃成员（只存计数不存文本，14 天滚动），／digest-now 现算概览，／digest-reset 清空。改编自 AstrBot 群分析总结的确定性残量。",
+      "description": "群活跃度统计：消息钩子按会话累计每日总量、分时段分布与发言成员计数（只存计数与显示名，不存消息文本，14 天滚动窗口，成员上限 200），／digest-now 输出确定性活跃概览（日均、最活跃时段、活跃成员，随要随算不沉淀），／digest-reset 清空本会话统计。改编自 AstrBot 群分析总结（432★）的确定性残量——上游的 LLM 时间线摘要（插件无模型面，消息回顾是记忆类插件的面）与定时主动推送（cron 无会话范围、推送审批语义待拍板）两项都是宿主边界设计输入。双模式存储助手，进程内与隔离 worker 同一份代码。",
+      "capabilities": [
+        "command",
+        "message",
+        "storage"
+      ],
+      "requires": [],
+      "readme": "packages/group-digest/README.md"
     }
   }
 }

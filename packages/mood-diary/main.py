@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import inspect
 import time
 
 from soapbot.plugins.base import Plugin
@@ -31,6 +32,20 @@ FIRST_KEY = "first_talk"      # session -> {"date": "YYYY-MM-DD", "anniversaries
 SNIPPET_CHARS = 60
 SNIPPETS_PER_DAY = 5
 TIMELINE_DAYS = 30
+
+
+async def sget(ctx: PluginContext, key: str, default=None):
+    """双模式存储读：进程内 sync / 隔离 worker async，同一份插件代码。"""
+    value = ctx.storage.get(key, default)
+    if inspect.isawaitable(value):
+        value = await value
+    return value
+
+
+async def sset(ctx: PluginContext, key: str, value) -> None:
+    result = ctx.storage.set(key, value)
+    if inspect.isawaitable(result):
+        await result
 
 TONES = (
     (15, "开心"),
@@ -68,7 +83,9 @@ class MoodDiaryPlugin(Plugin):
         @ctx.on_message
         async def observe(caller: CallerContext, text: str) -> None:
             session = caller.session_key
-            stats = ctx.storage.get(STATS_KEY) or {}
+            if not session:
+                return
+            stats = await sget(ctx, STATS_KEY) or {}
             entry = stats.get(session) or {}
             if entry.get("day") != _today():
                 entry = {"day": _today(), "count": 0, "snippets": []}
@@ -77,36 +94,36 @@ class MoodDiaryPlugin(Plugin):
             if snippet and len(entry["snippets"]) < SNIPPETS_PER_DAY:
                 entry["snippets"] = entry.get("snippets", []) + [snippet]
             stats[session] = entry
-            ctx.storage.set(STATS_KEY, stats)
+            await sset(ctx, STATS_KEY, stats)
 
-            first = ctx.storage.get(FIRST_KEY) or {}
+            first = await sget(ctx, FIRST_KEY) or {}
             if session not in first:
                 first[session] = {"date": _today(), "anniversaries": []}
-                ctx.storage.set(FIRST_KEY, first)
+                await sset(ctx, FIRST_KEY, first)
 
         @ctx.command("mood-on", description="开启每日心情日记与主动一句", usage="/mood-on")
         async def mood_on(caller: CallerContext, args: list[str]) -> str:
-            cfg = ctx.storage.get(CFG_KEY) or {}
+            cfg = await sget(ctx, CFG_KEY) or {}
             cfg[caller.session_key] = {"set_at": time.time()}
-            ctx.storage.set(CFG_KEY, cfg)
-            first = ctx.storage.get(FIRST_KEY) or {}
+            await sset(ctx, CFG_KEY, cfg)
+            first = await sget(ctx, FIRST_KEY) or {}
             since = (first.get(caller.session_key) or {}).get("date", "今天")
             return f"已开启心情日记（从 {since} 记起）。每晚 21:50 记一笔；/mood 查看。"
 
         @ctx.command("mood-off", description="关闭心情日记", usage="/mood-off")
         async def mood_off(caller: CallerContext, args: list[str]) -> str:
-            cfg = ctx.storage.get(CFG_KEY) or {}
+            cfg = await sget(ctx, CFG_KEY) or {}
             cfg.pop(caller.session_key, None)
-            ctx.storage.set(CFG_KEY, cfg)
+            await sset(ctx, CFG_KEY, cfg)
             return "已关闭。时间线保留，重新开启后接着记。"
 
         @ctx.command("mood", description="查看最近七天的心情日记", usage="/mood")
         async def mood_view(caller: CallerContext, args: list[str]) -> str:
-            timeline = (ctx.storage.get(TIMELINE_KEY) or {}).get(caller.session_key) or []
+            timeline = ((await sget(ctx, TIMELINE_KEY)) or {}).get(caller.session_key) or []
             if not timeline:
                 return "还没有日记。开启（/mood-on）后每晚 21:50 记一笔。"
             lines = [f"{e['date']} {e['tone']}（{e['count']} 条）" for e in timeline[-7:]]
-            stats = (ctx.storage.get(STATS_KEY) or {}).get(caller.session_key) or {}
+            stats = ((await sget(ctx, STATS_KEY)) or {}).get(caller.session_key) or {}
             if stats.get("day") == _today():
                 lines.append(f"今天：{_tone(int(stats.get('count', 0)))}（{stats.get('count', 0)} 条，尚未入夜记）")
             return "最近的心情：\n" + "\n".join(lines)
@@ -114,17 +131,17 @@ class MoodDiaryPlugin(Plugin):
         @ctx.command("mood-forget", description="清空心情日记与统计", usage="/mood-forget")
         async def mood_forget(caller: CallerContext, args: list[str]) -> str:
             for key in (STATS_KEY, TIMELINE_KEY, FIRST_KEY):
-                data = ctx.storage.get(key) or {}
+                data = await sget(ctx, key) or {}
                 data.pop(caller.session_key, None)
-                ctx.storage.set(key, data)
+                await sset(ctx, key, data)
             return "心情日记已清空。"
 
         @ctx.cron("50 21 * * *", name="mood-diary-tick")
         async def tick() -> None:
-            cfg = ctx.storage.get(CFG_KEY) or {}
-            stats = ctx.storage.get(STATS_KEY) or {}
-            timeline = ctx.storage.get(TIMELINE_KEY) or {}
-            first = ctx.storage.get(FIRST_KEY) or {}
+            cfg = await sget(ctx, CFG_KEY) or {}
+            stats = await sget(ctx, STATS_KEY) or {}
+            timeline = await sget(ctx, TIMELINE_KEY) or {}
+            first = await sget(ctx, FIRST_KEY) or {}
             today = _today()
             now_local = dt.datetime.now()
             for session in list(cfg.keys()):
@@ -138,7 +155,7 @@ class MoodDiaryPlugin(Plugin):
                 days = timeline.get(session) or []
                 days = (days + [{"date": today, "tone": tone, "count": count, "note": note}])[-TIMELINE_DAYS:]
                 timeline[session] = days
-                ctx.storage.set(TIMELINE_KEY, timeline)
+                await sset(ctx, TIMELINE_KEY, timeline)
 
                 # 纪念日：第一次对话的周年（每年一次，标记防重）。
                 first_entry = first.get(session) or {}
@@ -158,7 +175,7 @@ class MoodDiaryPlugin(Plugin):
                                 dt.date.today().year
                             ]
                             first[session] = first_entry
-                            ctx.storage.set(FIRST_KEY, first)
+                            await sset(ctx, FIRST_KEY, first)
                             sent_line = ANNIVERSARY_LINE.format(days=days_together)
                     except ValueError:
                         pass
