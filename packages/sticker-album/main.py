@@ -56,6 +56,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import inspect
 import re
 import time
 import uuid
@@ -299,6 +300,13 @@ class StickerAlbumPlugin(Plugin):
         """包枚举走注册表键（隔离 worker 的 storage 没有 keys()）。default 恒在。"""
         registry = await sget(ctx, PACKS_KEY) or [DEFAULT_PACK]
         return sorted(set(registry) | {DEFAULT_PACK})
+
+    async def _packs(self, ctx: PluginContext) -> list[tuple[str, int]]:
+        """[(包名, 张数)]——meme-packs / meme-stats 的数据源。"""
+        out: list[tuple[str, int]] = []
+        for pack in await self._pack_names(ctx):
+            out.append((pack, len(await self._album(ctx, pack))))
+        return out
 
     async def _register_pack(self, ctx: PluginContext, pack: str) -> None:
         if not PACK_RE.match(pack):
