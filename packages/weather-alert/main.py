@@ -27,11 +27,27 @@ cron 直接跳过——不猜默认地点。
 
 from __future__ import annotations
 
+import inspect
 import json
 import time
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+
+
+async def sget(ctx: PluginContext, key: str, default=None):
+    """双模式存储读：进程内 sync / 隔离 worker async，同一份插件代码。"""
+    value = ctx.storage.get(key, default)
+    if inspect.isawaitable(value):
+        value = await value
+    return value
+
+
+async def sset(ctx: PluginContext, key: str, value) -> None:
+    result = ctx.storage.set(key, value)
+    if inspect.isawaitable(result):
+        await result
+
 
 CFG_KEY = "config"
 SPOKEN_KEY = "spoken_titles"
@@ -63,7 +79,7 @@ class WeatherAlertPlugin(Plugin):
                 lat, lon = float(args[1]), float(args[2])
             except ValueError:
                 return "经纬度要是数字，例如：/weather-set 北京市 39.90 116.40"
-            ctx.storage.set(CFG_KEY, {
+            await sset(ctx, CFG_KEY, {
                 "province": province,
                 "lat": lat,
                 "lon": lon,
@@ -74,7 +90,7 @@ class WeatherAlertPlugin(Plugin):
 
         @ctx.command("weather", description="看当前天气与最新一次抓到的预警", usage="/weather")
         async def weather(caller: CallerContext, args: list[str]) -> str:
-            cfg = ctx.storage.get(CFG_KEY) or {}
+            cfg = await sget(ctx, CFG_KEY) or {}
             if not cfg.get("lat"):
                 return "先用 /weather-set <省份> <纬度> <经度> 配置一次。"
             # SafeHttpClient.fetch 不接受单独的 params：查询串手工拼，值都来自
@@ -88,44 +104,44 @@ class WeatherAlertPlugin(Plugin):
             temp = current.get("temperature", "?")
             wind = current.get("windspeed", "?")
             lines = [f"当前气温 {temp}°C，风速 {wind} km/h。"]
-            spoken = ctx.storage.get(SPOKEN_KEY) or []
+            spoken = await sget(ctx, SPOKEN_KEY) or []
             fresh = await _fetch_new_warnings(ctx, cfg, spoken)
             if fresh:
                 lines.append("新预警：")
                 lines.extend(f"- {t}" for t in fresh)
-                _mark_spoken(ctx, fresh)
+                await _mark_spoken(ctx, fresh)
             else:
                 lines.append("没有新的预警。")
             return "\n".join(lines)
 
         @ctx.command("weather-pending", description="看还没播报过的预警", usage="/weather-pending")
         async def weather_pending(caller: CallerContext, args: list[str]) -> str:
-            fresh = await _fetch_new_warnings(ctx, ctx.storage.get(CFG_KEY) or {},
-                                             ctx.storage.get(SPOKEN_KEY) or [])
+            fresh = await _fetch_new_warnings(ctx, (await sget(ctx, CFG_KEY)) or {},
+                                             (await sget(ctx, SPOKEN_KEY)) or [])
             if not fresh:
                 return "没有未播报的预警。"
             return "未播报的预警：\n" + "\n".join(f"- {t}" for t in fresh)
 
         @ctx.command("weather-ack", description="把当前预警标记为已说", usage="/weather-ack")
         async def weather_ack(caller: CallerContext, args: list[str]) -> str:
-            cfg = ctx.storage.get(CFG_KEY) or {}
-            spoken = ctx.storage.get(SPOKEN_KEY) or []
+            cfg = await sget(ctx, CFG_KEY) or {}
+            spoken = await sget(ctx, SPOKEN_KEY) or []
             fresh = await _fetch_new_warnings(ctx, cfg, spoken)
-            _mark_spoken(ctx, fresh)
+            await _mark_spoken(ctx, fresh)
             return f"已标记 {len(fresh)} 条为已说。"
 
         @ctx.command("weather-clear", description="清空去重记录", usage="/weather-clear")
         async def weather_clear(caller: CallerContext, args: list[str]) -> str:
-            ctx.storage.set(SPOKEN_KEY, [])
+            await sset(ctx, SPOKEN_KEY, [])
             return "已清空去重记录。"
 
         @ctx.cron("0 * * * *", name="weather-alert-tick")
         async def tick() -> None:
             """Hourly: fetch, filter to unseen, deliver to the configuring session."""
-            cfg = ctx.storage.get(CFG_KEY) or {}
+            cfg = await sget(ctx, CFG_KEY) or {}
             if not cfg.get("lat") or not cfg.get("session_key"):
                 return
-            spoken = ctx.storage.get(SPOKEN_KEY) or []
+            spoken = await sget(ctx, SPOKEN_KEY) or []
             fresh = await _fetch_new_warnings(ctx, cfg, spoken)
             if not fresh:
                 return
@@ -134,7 +150,7 @@ class WeatherAlertPlugin(Plugin):
                 await ctx.send(text, session_key=str(cfg["session_key"]))
             except (PermissionError, RuntimeError, ValueError):
                 return  # 发送失败不动 spoken：下次 tick 重试同样的预警
-            _mark_spoken(ctx, fresh)
+            await _mark_spoken(ctx, fresh)
 
 
 async def _fetch_new_warnings(ctx: PluginContext, cfg: dict, spoken: list) -> list[str]:
@@ -171,9 +187,9 @@ async def _fetch_new_warnings(ctx: PluginContext, cfg: dict, spoken: list) -> li
     return titles[:20]
 
 
-def _mark_spoken(ctx: PluginContext, titles: list[str]) -> None:
+async def _mark_spoken(ctx: PluginContext, titles: list[str]) -> None:
     if not titles:
         return
-    spoken = [t for t in (ctx.storage.get(SPOKEN_KEY) or []) if isinstance(t, str)]
+    spoken = [t for t in ((await sget(ctx, SPOKEN_KEY)) or []) if isinstance(t, str)]
     spoken = (spoken + titles)[-MAX_SPOKEN:]
-    ctx.storage.set(SPOKEN_KEY, spoken)
+    await sset(ctx, SPOKEN_KEY, spoken)

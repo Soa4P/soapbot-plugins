@@ -15,11 +15,27 @@
 
 from __future__ import annotations
 
+import inspect
 import json
 import time
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+
+
+async def sget(ctx: PluginContext, key: str, default=None):
+    """双模式存储读：进程内 sync / 隔离 worker async，同一份插件代码。"""
+    value = ctx.storage.get(key, default)
+    if inspect.isawaitable(value):
+        value = await value
+    return value
+
+
+async def sset(ctx: PluginContext, key: str, value) -> None:
+    result = ctx.storage.set(key, value)
+    if inspect.isawaitable(result):
+        await result
+
 
 TREE_KEY = "tree"        # {"skills": {id: {...}}, "done": {id: {"ts"}}}
 REVIEW_KEY = "review"     # {"session": ..., "days": 7, "reviewed": {id: ts}}
@@ -52,7 +68,7 @@ class SkillTreePlugin(Plugin):
             if len(args) < 2:
                 return "用法：/tree-add <id> <名称> [必须前置,逗号分隔] [推荐前置,逗号分隔]"
             sid, name = args[0].strip(), args[1].strip()
-            tree = ctx.storage.get(TREE_KEY) or {}
+            tree = await sget(ctx, TREE_KEY) or {}
             skills = tree.get("skills", {})
             if sid in skills:
                 return f"「{sid}」已存在。"
@@ -72,7 +88,7 @@ class SkillTreePlugin(Plugin):
                 "added_at": time.time(),
             }
             tree["skills"] = skills
-            ctx.storage.set(TREE_KEY, tree)
+            await sset(ctx, TREE_KEY, tree)
             return f"技能「{name}」（{sid}）已加入，必须前置 {len(reqs)}、推荐 {len(soft)}。"
 
         @ctx.command("tree-done", description="点亮一个技能（必须前置未齐会被拒绝）",
@@ -81,7 +97,7 @@ class SkillTreePlugin(Plugin):
             if not args:
                 return "用法：/tree-done <id>"
             sid = args[0].strip()
-            tree = ctx.storage.get(TREE_KEY) or {}
+            tree = await sget(ctx, TREE_KEY) or {}
             skills = tree.get("skills", {})
             skill = skills.get(sid)
             if not skill:
@@ -97,7 +113,7 @@ class SkillTreePlugin(Plugin):
                 return f"必须前置还没点亮：{'、'.join(missing)}。{note}学会了再来点亮。"
             done[sid] = {"ts": time.time()}
             tree["done"] = done
-            ctx.storage.set(TREE_KEY, tree)
+            await sset(ctx, TREE_KEY, tree)
             unlocked = [
                 other for other, meta in skills.items()
                 if other not in done and sid in meta.get("reqs", [])
@@ -110,7 +126,7 @@ class SkillTreePlugin(Plugin):
         async def tree_undo(caller: CallerContext, args: list[str]) -> str:
             if not args:
                 return "用法：/tree-undo <id>"
-            tree = ctx.storage.get(TREE_KEY) or {}
+            tree = await sget(ctx, TREE_KEY) or {}
             done = tree.get("done", {})
             sid = args[0].strip()
             if sid not in done:
@@ -124,14 +140,14 @@ class SkillTreePlugin(Plugin):
                 done.pop(d, None)
             done.pop(sid, None)
             tree["done"] = done
-            ctx.storage.set(TREE_KEY, tree)
+            await sset(ctx, TREE_KEY, tree)
             note = f"，连带撤了 {len(dependents)} 个依赖它的点亮" if dependents else ""
             return f"已取消「{sid}」{note}。"
 
         @ctx.command("tree", description="查看整棵树（✅ 已点亮 / ⭕ 可点亮 / 🔒 锁定）",
                      usage="/tree")
         async def tree_view(caller: CallerContext, args: list[str]) -> str:
-            tree = ctx.storage.get(TREE_KEY) or {}
+            tree = await sget(ctx, TREE_KEY) or {}
             skills = tree.get("skills", {})
             if not skills:
                 return "树是空的。/tree-add <id> <名称> [必须前置] 建第一棵。"
@@ -150,7 +166,7 @@ class SkillTreePlugin(Plugin):
 
         @ctx.command("tree-progress", description="统计进度与下一个可点亮的", usage="/tree-progress")
         async def tree_progress(caller: CallerContext, args: list[str]) -> str:
-            tree = ctx.storage.get(TREE_KEY) or {}
+            tree = await sget(ctx, TREE_KEY) or {}
             skills = tree.get("skills", {})
             done = tree.get("done", {})
             ready = [
@@ -164,7 +180,7 @@ class SkillTreePlugin(Plugin):
 
         @ctx.command("tree-export", description="导出整棵树与进度（JSON）", usage="/tree-export")
         async def tree_export(caller: CallerContext, args: list[str]) -> str:
-            tree = ctx.storage.get(TREE_KEY) or {}
+            tree = await sget(ctx, TREE_KEY) or {}
             return "```json\n" + json.dumps(tree, ensure_ascii=False) + "\n```"
 
         @ctx.command("tree-import", description="导入树与进度（保守合并：已有点亮不被覆盖）",
@@ -179,7 +195,7 @@ class SkillTreePlugin(Plugin):
                 return "JSON 解析失败。/tree-export 的输出可以直接粘回来。"
             if not isinstance(incoming, dict) or "skills" not in incoming:
                 return "结构不对：需要 {\"skills\": ..., \"done\": ...}。"
-            tree = ctx.storage.get(TREE_KEY) or {}
+            tree = await sget(ctx, TREE_KEY) or {}
             skills = tree.get("skills", {})
             merged_new = 0
             for sid, meta in (incoming.get("skills") or {}).items():
@@ -193,7 +209,7 @@ class SkillTreePlugin(Plugin):
                     done[sid] = incoming["done"][sid]
             tree["skills"] = skills
             tree["done"] = done
-            ctx.storage.set(TREE_KEY, tree)
+            await sset(ctx, TREE_KEY, tree)
             return f"已导入：新增 {merged_new} 个技能；已有点亮保持不变（保守合并）。"
 
         @ctx.command("tree-review-set", description="开启复习提醒（当前会话接收，默认每 7 天）",
@@ -202,26 +218,26 @@ class SkillTreePlugin(Plugin):
             days = 7
             if args and args[0].isdigit():
                 days = max(1, min(int(args[0]), 90))
-            review = ctx.storage.get(REVIEW_KEY) or {}
+            review = await sget(ctx, REVIEW_KEY) or {}
             review["session"] = caller.session_key
             review["days"] = days
-            ctx.storage.set(REVIEW_KEY, review)
+            await sset(ctx, REVIEW_KEY, review)
             return f"复习提醒已开启（每 {days} 天）。会从点亮最早的技能开始提醒。"
 
         @ctx.command("tree-review-off", description="关闭复习提醒", usage="/tree-review-off")
         async def review_off(caller: CallerContext, args: list[str]) -> str:
-            review = ctx.storage.get(REVIEW_KEY) or {}
+            review = await sget(ctx, REVIEW_KEY) or {}
             review.pop("session", None)
-            ctx.storage.set(REVIEW_KEY, review)
+            await sset(ctx, REVIEW_KEY, review)
             return "复习提醒已关闭。"
 
         @ctx.cron("30 9 * * *", name="skill-tree-review")
         async def review_tick() -> None:
-            review = ctx.storage.get(REVIEW_KEY) or {}
+            review = await sget(ctx, REVIEW_KEY) or {}
             session = review.get("session")
             if not session:
                 return
-            tree = ctx.storage.get(TREE_KEY) or {}
+            tree = await sget(ctx, TREE_KEY) or {}
             done = tree.get("done", {})
             reviewed = review.get("reviewed", {})
             import time as _t
@@ -242,7 +258,7 @@ class SkillTreePlugin(Plugin):
             for sid, _name, _ts in picks:
                 reviewed[sid] = now
             review["reviewed"] = reviewed
-            ctx.storage.set(REVIEW_KEY, review)
+            await sset(ctx, REVIEW_KEY, review)
             try:
                 await ctx.send(
                     "复习提醒——这些你点亮得最早，还记得吗？\n" + "\n".join(lines),
@@ -255,5 +271,5 @@ class SkillTreePlugin(Plugin):
         async def tree_reset(caller: CallerContext, args: list[str]) -> str:
             if args[:1] != ["确认"]:
                 return "这会清空整棵树与进度。确定的话：/tree-reset 确认"
-            ctx.storage.set(TREE_KEY, {})
+            await sset(ctx, TREE_KEY, {})
             return "已清空。"

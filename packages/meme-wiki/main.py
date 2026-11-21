@@ -20,8 +20,25 @@
 
 from __future__ import annotations
 
+import inspect
+
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+
+
+async def sget(ctx: PluginContext, key: str, default=None):
+    """双模式存储读：进程内 sync / 隔离 worker async，同一份插件代码。"""
+    value = ctx.storage.get(key, default)
+    if inspect.isawaitable(value):
+        value = await value
+    return value
+
+
+async def sset(ctx: PluginContext, key: str, value) -> None:
+    result = ctx.storage.set(key, value)
+    if inspect.isawaitable(result):
+        await result
+
 
 WIKI_KEY = "wiki_entries"
 LOCAL_KEY = "local_only"
@@ -41,8 +58,8 @@ class MemeWikiPlugin(Plugin):
             if not args:
                 return "用法：/meme <词>"
             query = " ".join(args).strip()
-            wiki = ctx.storage.get(WIKI_KEY) or {}
-            local = ctx.storage.get(LOCAL_KEY) or {}
+            wiki = await sget(ctx, WIKI_KEY) or {}
+            local = await sget(ctx, LOCAL_KEY) or {}
             hits = _match(query, {**wiki, **local})
             if not hits:
                 return f"词库里没有「{query}」。/meme-add <词> <解释> 自己补一条。"
@@ -62,11 +79,11 @@ class MemeWikiPlugin(Plugin):
             summary = " ".join(args[1:]).strip()
             if not title or len(summary) < 2:
                 return "词条名和解释都要有。"
-            local = ctx.storage.get(LOCAL_KEY) or {}
-            if len(local) + len(ctx.storage.get(WIKI_KEY) or {}) >= MAX_ENTRIES:
+            local = await sget(ctx, LOCAL_KEY) or {}
+            if len(local) + len((await sget(ctx, WIKI_KEY)) or {}) >= MAX_ENTRIES:
                 return f"词库已到 {MAX_ENTRIES} 条上限。"
             local[title] = {"summary": summary[:800], "aliases": [], "manual": True}
-            ctx.storage.set(LOCAL_KEY, local)
+            await sset(ctx, LOCAL_KEY, local)
             return f"已收录「{title}」。同步词库不会覆盖手动词条。"
 
         @ctx.command("meme-rm", description="删一条词条", usage="/meme-rm <词>")
@@ -74,15 +91,15 @@ class MemeWikiPlugin(Plugin):
             if not args:
                 return "用法：/meme-rm <词>"
             title = args[0].strip()
-            local = ctx.storage.get(LOCAL_KEY) or {}
-            wiki = ctx.storage.get(WIKI_KEY) or {}
+            local = await sget(ctx, LOCAL_KEY) or {}
+            wiki = await sget(ctx, WIKI_KEY) or {}
             if title in local:
                 del local[title]
-                ctx.storage.set(LOCAL_KEY, local)
+                await sset(ctx, LOCAL_KEY, local)
                 return f"已删手动词条「{title}」。"
             if title in wiki:
                 del wiki[title]
-                ctx.storage.set(WIKI_KEY, wiki)
+                await sset(ctx, WIKI_KEY, wiki)
                 return f"已删同步词条「{title}」（下次同步会带回来）。"
             return f"词库里没有「{title}」。"
 
@@ -93,8 +110,8 @@ class MemeWikiPlugin(Plugin):
                 pages = max(1, min(int(args[0]) if args else 5, 20))
             except ValueError:
                 return "用法：/meme-sync [页数]"
-            wiki = ctx.storage.get(WIKI_KEY) or {}
-            local = ctx.storage.get(LOCAL_KEY) or {}
+            wiki = await sget(ctx, WIKI_KEY) or {}
+            local = await sget(ctx, LOCAL_KEY) or {}
             added = 0
             for page in range(pages):
                 offset = page * 100
@@ -129,15 +146,15 @@ class MemeWikiPlugin(Plugin):
                         "tags": [str(t) for t in (row.get("tags") or [])][:10],
                     }
                     added += 1
-                ctx.storage.set(WIKI_KEY, wiki)
+                await sset(ctx, WIKI_KEY, wiki)
                 if len(wiki) + len(local) >= MAX_ENTRIES:
                     break
             return f"同步完成：新入库 {added} 条，词库共 {len(wiki) + len(local)} 条。"
 
         @ctx.command("meme-count", description="看词库规模", usage="/meme-count")
         async def meme_count(caller: CallerContext, args: list[str]) -> str:
-            wiki = ctx.storage.get(WIKI_KEY) or {}
-            local = ctx.storage.get(LOCAL_KEY) or {}
+            wiki = await sget(ctx, WIKI_KEY) or {}
+            local = await sget(ctx, LOCAL_KEY) or {}
             return f"同步词条 {len(wiki)} 条，手动词条 {len(local)} 条。"
 
 

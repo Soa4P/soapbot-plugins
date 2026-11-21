@@ -20,10 +20,26 @@ want model judging can pipe the report into their own flow.
 
 from __future__ import annotations
 
+import inspect
 import time
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+
+
+async def sget(ctx: PluginContext, key: str, default=None):
+    """双模式存储读：进程内 sync / 隔离 worker async，同一份插件代码。"""
+    value = ctx.storage.get(key, default)
+    if inspect.isawaitable(value):
+        value = await value
+    return value
+
+
+async def sset(ctx: PluginContext, key: str, value) -> None:
+    result = ctx.storage.set(key, value)
+    if inspect.isawaitable(result):
+        await result
+
 
 SEEN_KEY = "seen_bvids"
 CFG_KEY = "config"
@@ -69,7 +85,7 @@ class BiliScrollPlugin(Plugin):
                      usage="/bili-scroll-set <逗号分隔关键词>（留空用默认）")
         async def scroll_set(caller: CallerContext, args: list[str]) -> str:
             keywords = [k.strip() for k in (args[0] if args else "").split(",") if k.strip()]
-            ctx.storage.set(CFG_KEY, {
+            await sset(ctx, CFG_KEY, {
                 "keywords": keywords or DEFAULT_KEYWORDS,
                 "session_key": caller.session_key,
             })
@@ -82,7 +98,7 @@ class BiliScrollPlugin(Plugin):
 
         @ctx.command("bili-scroll-forget", description="清空已推荐去重记录", usage="/bili-scroll-forget")
         async def scroll_forget(caller: CallerContext, args: list[str]) -> str:
-            ctx.storage.set(SEEN_KEY, [])
+            await sset(ctx, SEEN_KEY, [])
             return "已清空去重记录。"
 
         @ctx.cron("0 21 * * *", name="bili-scroll-daily")
@@ -93,10 +109,10 @@ class BiliScrollPlugin(Plugin):
             now = dt.datetime.now()
             if now.hour < WINDOW_START_HOUR:
                 return  # 未到作息窗口；手动 /bili-scroll-now 不受此限
-            cfg = ctx.storage.get(CFG_KEY) or {}
+            cfg = await sget(ctx, CFG_KEY) or {}
             if not cfg.get("session_key"):
                 return
-            backoff_until = float(ctx.storage.get(RISK_KEY) or 0)
+            backoff_until = float((await sget(ctx, RISK_KEY)) or 0)
             if time.time() < backoff_until:
                 return  # 风控退避中：尊重平台，别硬顶
             report = await _run_round(ctx, deliver_to=None)
@@ -107,14 +123,14 @@ class BiliScrollPlugin(Plugin):
                     return  # 发送失败：不标已读，明天同一批视频还会被看到
 
         async def _run_round(ctx: PluginContext, *, deliver_to: str | None) -> str:
-            cfg = ctx.storage.get(CFG_KEY) or {}
+            cfg = await sget(ctx, CFG_KEY) or {}
             keywords = [str(k) for k in (cfg.get("keywords") or DEFAULT_KEYWORDS)]
-            seen = {str(b) for b in (ctx.storage.get(SEEN_KEY) or []) if isinstance(b, str)}
+            seen = {str(b) for b in ((await sget(ctx, SEEN_KEY)) or []) if isinstance(b, str)}
 
             payload = await ctx.bilibili.get_json(POPULAR_PATH, params={"ps": "40"})
             if payload.get("code") == -412:
                 # 风控拦截（whale 的 412/429 退避思想）：半小时内不再碰 B 站。
-                ctx.storage.set(RISK_KEY, str(time.time() + RISK_BACKOFF_SECONDS))
+                await sset(ctx, RISK_KEY, str(time.time() + RISK_BACKOFF_SECONDS))
                 return "B 站风控拦截了这轮抓取，半小时后重试。"
             if payload.get("code") != 0:
                 return f"B 站热门接口返回错误码 {payload.get('code')}"
@@ -146,8 +162,8 @@ class BiliScrollPlugin(Plugin):
                     f"- [{bvid}] {title}（{owner} · 播放 {stat.get('view', 0)}）"
                 )
                 new_bvids.append(bvid)
-            seen_list = [b for b in (ctx.storage.get(SEEN_KEY) or []) if isinstance(b, str)]
-            ctx.storage.set(SEEN_KEY, (seen_list + new_bvids)[-MAX_SEEN:])
+            seen_list = [b for b in ((await sget(ctx, SEEN_KEY)) or []) if isinstance(b, str)]
+            await sset(ctx, SEEN_KEY, (seen_list + new_bvids)[-MAX_SEEN:])
             # 只返回报告；投递由调用方决定（命令路径=返回值即展示，cron 路径=ctx.send）。
             return "今天的 B 站摘要：\n" + "\n".join(lines)
 

@@ -21,12 +21,28 @@
 from __future__ import annotations
 
 import datetime as dt
+import inspect
 import re
 import time
 import xml.etree.ElementTree as ET
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+
+
+async def sget(ctx: PluginContext, key: str, default=None):
+    """双模式存储读：进程内 sync / 隔离 worker async，同一份插件代码。"""
+    value = ctx.storage.get(key, default)
+    if inspect.isawaitable(value):
+        value = await value
+    return value
+
+
+async def sset(ctx: PluginContext, key: str, value) -> None:
+    result = ctx.storage.set(key, value)
+    if inspect.isawaitable(result):
+        await result
+
 
 CFG_KEY = "sessions"        # session -> {"set_at"}
 DRAFT_KEY = "draft"         # session -> {"text", "source_title", "ts", "day"}
@@ -70,9 +86,9 @@ class QzoneComposerPlugin(Plugin):
         @ctx.command("qzc-set", description="开启每日素材草稿（当前会话接收提醒并确认发布）",
                      usage="/qzc-set")
         async def qzc_set(caller: CallerContext, args: list[str]) -> str:
-            cfg = ctx.storage.get(CFG_KEY) or {}
+            cfg = await sget(ctx, CFG_KEY) or {}
             cfg[caller.session_key] = {"set_at": time.time()}
-            ctx.storage.set(CFG_KEY, cfg)
+            await sset(ctx, CFG_KEY, cfg)
             return (
                 "已开启。每天 10:00 从 http 允许列表里的 RSS 源抓素材、脱敏后起草一条，"
                 "提醒发到这里；发布要你敲 /qzc-confirm（三重确认的最后一道）。"
@@ -81,9 +97,9 @@ class QzoneComposerPlugin(Plugin):
 
         @ctx.command("qzc-off", description="关闭每日草稿", usage="/qzc-off")
         async def qzc_off(caller: CallerContext, args: list[str]) -> str:
-            cfg = ctx.storage.get(CFG_KEY) or {}
+            cfg = await sget(ctx, CFG_KEY) or {}
             cfg.pop(caller.session_key, None)
-            ctx.storage.set(CFG_KEY, cfg)
+            await sset(ctx, CFG_KEY, cfg)
             return "已关闭。未确认的草稿保留。"
 
         @ctx.command("qzc-draft-now", description="现在起草一轮（不发布）", usage="/qzc-draft-now")
@@ -93,11 +109,11 @@ class QzoneComposerPlugin(Plugin):
         @ctx.command("qzc-confirm", description="确认发布当前草稿（三重确认的最后一道）",
                      usage="/qzc-confirm")
         async def qzc_confirm(caller: CallerContext, args: list[str]) -> str:
-            draft = ctx.storage.get(DRAFT_KEY) or {}
+            draft = await sget(ctx, DRAFT_KEY) or {}
             entry = draft.get(caller.session_key)
             if not isinstance(entry, dict) or not entry.get("text"):
                 return "没有待确认的草稿。"
-            counts = ctx.storage.get(DAY_KEY) or {}
+            counts = await sget(ctx, DAY_KEY) or {}
             bucket = counts.get(caller.session_key) or {}
             if bucket.get("day") != dt.date.today().isoformat():
                 bucket = {"day": dt.date.today().isoformat(), "posted": 0}
@@ -108,25 +124,25 @@ class QzoneComposerPlugin(Plugin):
             except (PermissionError, RuntimeError, ValueError) as exc:
                 # 写失败不自动重试（dsh-qzone 实测：票据会掉，重试是人的决定）。
                 counts[caller.session_key] = bucket
-                ctx.storage.set(DAY_KEY, counts)
+                await sset(ctx, DAY_KEY, counts)
                 return f"发布失败：{exc}。要不要再试，由你决定。"
             bucket["posted"] = int(bucket.get("posted", 0)) + 1
             counts[caller.session_key] = bucket
-            ctx.storage.set(DAY_KEY, counts)
+            await sset(ctx, DAY_KEY, counts)
             draft.pop(caller.session_key, None)
-            ctx.storage.set(DRAFT_KEY, draft)
+            await sset(ctx, DRAFT_KEY, draft)
             return f"已发布：{str(entry['text'])[:50]}"
 
         @ctx.command("qzc-drop", description="放弃当前草稿", usage="/qzc-drop")
         async def qzc_drop(caller: CallerContext, args: list[str]) -> str:
-            draft = ctx.storage.get(DRAFT_KEY) or {}
+            draft = await sget(ctx, DRAFT_KEY) or {}
             draft.pop(caller.session_key, None)
-            ctx.storage.set(DRAFT_KEY, draft)
+            await sset(ctx, DRAFT_KEY, draft)
             return "草稿已放弃。"
 
         @ctx.cron("0 10 * * *", name="qzone-composer-daily")
         async def daily() -> None:
-            cfg = ctx.storage.get(CFG_KEY) or {}
+            cfg = await sget(ctx, CFG_KEY) or {}
             for session in list(cfg.keys()):
                 result = await self._draft(ctx, session, manual=False)
                 if result.startswith("草稿"):
@@ -136,13 +152,13 @@ class QzoneComposerPlugin(Plugin):
                         continue  # 发送失败：草稿留在 storage，/qzc-confirm 仍可用
 
         async def _draft(self, ctx: PluginContext, session: str, *, manual: bool) -> str:
-            counts = ctx.storage.get(DAY_KEY) or {}
+            counts = await sget(ctx, DAY_KEY) or {}
             bucket = counts.get(session) or {}
             if bucket.get("day") != dt.date.today().isoformat():
                 bucket = {"day": dt.date.today().isoformat(), "drafted": 0, "posted": 0}
             if not manual and int(bucket.get("drafted", 0)) >= DAILY_DRAFT_LIMIT:
                 return ""
-            existing = ctx.storage.get(DRAFT_KEY) or {}
+            existing = await sget(ctx, DRAFT_KEY) or {}
             if isinstance(existing.get(session), dict) and existing[session].get("text"):
                 return f"草稿还在，先 /qzc-confirm 或 /qzc-drop：{str(existing[session]['text'])[:50]}"
 
@@ -168,11 +184,11 @@ class QzoneComposerPlugin(Plugin):
             text = LINE_TEMPLATE.format(title=title, source=source)[:TEXT_MAX_CHARS]
             bucket["drafted"] = int(bucket.get("drafted", 0)) + 1
             counts[session] = bucket
-            ctx.storage.set(DAY_KEY, counts)
-            draft = ctx.storage.get(DRAFT_KEY) or {}
+            await sset(ctx, DAY_KEY, counts)
+            draft = await sget(ctx, DRAFT_KEY) or {}
             draft[session] = {"text": text, "source_title": title, "ts": time.time(),
                               "day": dt.date.today().isoformat()}
-            ctx.storage.set(DRAFT_KEY, draft)
+            await sset(ctx, DRAFT_KEY, draft)
             return f"草稿（待确认，/qzc-confirm 发布 / /qzc-drop 放弃）：{text}"
 
         self._draft = _draft  # type: ignore[attr-defined]
