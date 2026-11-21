@@ -19,10 +19,26 @@
 
 from __future__ import annotations
 
+import inspect
 import time
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+
+
+async def sget(ctx: PluginContext, key: str, default=None):
+    """双模式存储读：进程内 sync / 隔离 worker async，同一份插件代码。"""
+    value = ctx.storage.get(key, default)
+    if inspect.isawaitable(value):
+        value = await value
+    return value
+
+
+async def sset(ctx: PluginContext, key: str, value) -> None:
+    result = ctx.storage.set(key, value)
+    if inspect.isawaitable(result):
+        await result
+
 
 CARDS_KEY = "cards"        # name -> {"text", "updated_at"}
 CH_KEY = "chapters"        # title -> {"text", "words", "updated_at", "history": [...]}
@@ -44,16 +60,16 @@ class NovelDeskPlugin(Plugin):
                 return "用法：/nd-card <名字> <内容...>"
             name = args[0].strip()
             text = " ".join(args[1:]).strip()[:TEXT_MAX_CHARS]
-            cards = ctx.storage.get(CARDS_KEY) or {}
+            cards = await sget(ctx, CARDS_KEY) or {}
             if name not in cards and len(cards) >= MAX_CARDS:
                 return f"设定卡已满（{MAX_CARDS} 张），先 /nd-card-del 腾位置。"
             cards[name] = {"text": text, "updated_at": time.time()}
-            ctx.storage.set(CARDS_KEY, cards)
+            await sset(ctx, CARDS_KEY, cards)
             return f"设定卡「{name}」已保存（{len(text)} 字）。/nd-search 可按关键词检索。"
 
         @ctx.command("nd-card-list", description="列出全部设定卡名", usage="/nd-card-list")
         async def nd_card_list(caller: CallerContext, args: list[str]) -> str:
-            cards = ctx.storage.get(CARDS_KEY) or {}
+            cards = await sget(ctx, CARDS_KEY) or {}
             if not cards:
                 return "还没有设定卡。/nd-card <名字> <内容> 建第一张。"
             return "设定卡：" + "、".join(sorted(cards.keys()))
@@ -62,7 +78,7 @@ class NovelDeskPlugin(Plugin):
         async def nd_card_show(caller: CallerContext, args: list[str]) -> str:
             if not args:
                 return "用法：/nd-card-show <名字>"
-            cards = ctx.storage.get(CARDS_KEY) or {}
+            cards = await sget(ctx, CARDS_KEY) or {}
             entry = cards.get(args[0].strip())
             if not entry:
                 return f"没有「{args[0].strip()}」这张卡。/nd-card-list 列出全部。"
@@ -72,12 +88,12 @@ class NovelDeskPlugin(Plugin):
         async def nd_card_del(caller: CallerContext, args: list[str]) -> str:
             if not args:
                 return "用法：/nd-card-del <名字>"
-            cards = ctx.storage.get(CARDS_KEY) or {}
+            cards = await sget(ctx, CARDS_KEY) or {}
             name = args[0].strip()
             if name not in cards:
                 return f"没有「{name}」这张卡。"
             del cards[name]
-            ctx.storage.set(CARDS_KEY, cards)
+            await sset(ctx, CARDS_KEY, cards)
             return f"已删除「{name}」。"
 
         @ctx.command("nd-search", description="在全部设定卡里按关键词检索", usage="/nd-search <关键词>")
@@ -86,7 +102,7 @@ class NovelDeskPlugin(Plugin):
             if not args:
                 return "用法：/nd-search <关键词>"
             needle = args[0].strip()
-            cards = ctx.storage.get(CARDS_KEY) or {}
+            cards = await sget(ctx, CARDS_KEY) or {}
             lines: list[str] = []
             for name, entry in sorted(cards.items()):
                 text = str(entry.get("text", ""))
@@ -105,7 +121,7 @@ class NovelDeskPlugin(Plugin):
                 return "用法：/nd-ch <章节名> <正文...>"
             title = args[0].strip()
             chunk = " ".join(args[1:]).strip()[:CHUNK_CHARS]
-            chapters = ctx.storage.get(CH_KEY) or {}
+            chapters = await sget(ctx, CH_KEY) or {}
             if title not in chapters and len(chapters) >= MAX_CHAPTERS:
                 return f"章节已满（{MAX_CHAPTERS} 章），先 /nd-ch-del 腾位置。"
             entry = chapters.get(title) or {"text": "", "history": []}
@@ -121,12 +137,12 @@ class NovelDeskPlugin(Plugin):
                 "updated_at": time.time(),
                 "history": history,
             }
-            ctx.storage.set(CH_KEY, chapters)
+            await sset(ctx, CH_KEY, chapters)
             return f"「{title}」已保存：{len(text)} 字（本次 +{len(chunk)}，历史 {len(history)} 版）。"
 
         @ctx.command("nd-ch-list", description="列出章节与字数", usage="/nd-ch-list")
         async def nd_ch_list(caller: CallerContext, args: list[str]) -> str:
-            chapters = ctx.storage.get(CH_KEY) or {}
+            chapters = await sget(ctx, CH_KEY) or {}
             if not chapters:
                 return "还没有章节。/nd-ch <章节名> <正文> 开第一章。"
             total = sum(int(c.get("words", 0)) for c in chapters.values())
@@ -139,7 +155,7 @@ class NovelDeskPlugin(Plugin):
         async def nd_ch_show(caller: CallerContext, args: list[str]) -> str:
             if not args:
                 return "用法：/nd-ch-show <章节名> [字数]"
-            chapters = ctx.storage.get(CH_KEY) or {}
+            chapters = await sget(ctx, CH_KEY) or {}
             entry = chapters.get(args[0].strip())
             if not entry:
                 return f"没有「{args[0].strip()}」这一章。"
@@ -155,7 +171,7 @@ class NovelDeskPlugin(Plugin):
         async def nd_ch_undo(caller: CallerContext, args: list[str]) -> str:
             if not args:
                 return "用法：/nd-ch-undo <章节名>"
-            chapters = ctx.storage.get(CH_KEY) or {}
+            chapters = await sget(ctx, CH_KEY) or {}
             entry = chapters.get(args[0].strip())
             if not entry:
                 return f"没有「{args[0].strip()}」这一章。"
@@ -168,7 +184,7 @@ class NovelDeskPlugin(Plugin):
             entry["words"] = len(restored)
             entry["history"] = history + [current]
             chapters[args[0].strip()] = entry
-            ctx.storage.set(CH_KEY, chapters)
+            await sset(ctx, CH_KEY, chapters)
             return f"已恢复上一版（{len(restored)} 字）；当前版进了历史。"
 
         @ctx.command("nd-ch-del", description="删除一整个章节（含历史）",
@@ -176,18 +192,18 @@ class NovelDeskPlugin(Plugin):
         async def nd_ch_del(caller: CallerContext, args: list[str]) -> str:
             if not args:
                 return "用法：/nd-ch-del <章节名>"
-            chapters = ctx.storage.get(CH_KEY) or {}
+            chapters = await sget(ctx, CH_KEY) or {}
             title = args[0].strip()
             if title not in chapters:
                 return f"没有「{title}」这一章。"
             del chapters[title]
-            ctx.storage.set(CH_KEY, chapters)
+            await sset(ctx, CH_KEY, chapters)
             return f"已删除「{title}」（含全部历史）。"
 
         @ctx.command("nd-stats", description="全库字数统计", usage="/nd-stats")
         async def nd_stats(caller: CallerContext, args: list[str]) -> str:
-            cards = ctx.storage.get(CARDS_KEY) or {}
-            chapters = ctx.storage.get(CH_KEY) or {}
+            cards = await sget(ctx, CARDS_KEY) or {}
+            chapters = await sget(ctx, CH_KEY) or {}
             card_words = sum(len(str(c.get("text", ""))) for c in cards.values())
             ch_words = sum(int(c.get("words", 0)) for c in chapters.values())
             return (

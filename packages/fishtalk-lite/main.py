@@ -17,10 +17,26 @@ No model call — the capability set here does not include running the model.
 
 from __future__ import annotations
 
+import inspect
 import re
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+
+
+async def sget(ctx: PluginContext, key: str, default=None):
+    """双模式存储读：进程内 sync / 隔离 worker async，同一份插件代码。"""
+    value = ctx.storage.get(key, default)
+    if inspect.isawaitable(value):
+        value = await value
+    return value
+
+
+async def sset(ctx: PluginContext, key: str, value) -> None:
+    result = ctx.storage.set(key, value)
+    if inspect.isawaitable(result):
+        await result
+
 
 CORPUS_KEY = "corpus"
 MAX_CORPUS = 300
@@ -119,12 +135,12 @@ class FishTalkLitePlugin(Plugin):
                 sample = f"{title}｜{owner}｜{desc}"[:MAX_SAMPLE_CHARS]
             if not sample.strip("｜"):
                 return "这个视频没有可采样的文本。"
-            corpus = ctx.storage.get(CORPUS_KEY) or []
+            corpus = await sget(ctx, CORPUS_KEY) or []
             if not isinstance(corpus, list):
                 corpus = []
             corpus.append(sample)
             corpus = corpus[-MAX_CORPUS:]
-            ctx.storage.set(CORPUS_KEY, corpus)
+            await sset(ctx, CORPUS_KEY, corpus)
             kind = "字幕" if subtitle_text else "简介"
             return f"已收{kind}语料（{len(corpus)} 条）。多收几个你常看的 UP，检查才有基准。"
 
@@ -141,7 +157,7 @@ class FishTalkLitePlugin(Plugin):
 
         @ctx.command("fish-status", description="看语料有多少", usage="/fish-status")
         async def status(caller: CallerContext, args: list[str]) -> str:
-            corpus = ctx.storage.get(CORPUS_KEY) or []
+            corpus = await sget(ctx, CORPUS_KEY) or []
             return f"语料 {len(corpus)}/{MAX_CORPUS} 条。"
 
         @ctx.command("fish-decode", description="解码写给 AI 的载荷（base64 加异或加 gunzip）",
@@ -163,5 +179,5 @@ class FishTalkLitePlugin(Plugin):
         async def forget(caller: CallerContext, args: list[str]) -> str:
             if args[:1] != ["确认"]:
                 return "这会清空全部语料且找不回来。确定的话：/fish-forget 确认"
-            ctx.storage.set(CORPUS_KEY, [])
+            await sset(ctx, CORPUS_KEY, [])
             return "已全部忘掉。"

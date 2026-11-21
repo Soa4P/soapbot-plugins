@@ -16,6 +16,13 @@
         "digest": "sha256:134cbb54cf3212eb9c806a1e0439bf2fcf0c5d07488fd5cff99f85f642976bb2",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/self-nudge-0.1.1/self-nudge-0.1.1.zip"
+      },
+      {
+        "version": "0.1.2",
+        "released_at": "2026-11-21",
+        "digest": "sha256:1c9d05038f4b1f6f2e00327f775538cd1dc457640151ea21b642d6e2659f0b10",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/self-nudge-0.1.2/self-nudge-0.1.2.zip"
       }
     ],
     "weather-alert": [
@@ -32,6 +39,13 @@
         "digest": "sha256:bd8c55ee64d1129d31d0faf9315413faf4835d0211712255358895aceb5937b9",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/weather-alert-0.1.1/weather-alert-0.1.1.zip"
+      },
+      {
+        "version": "0.1.2",
+        "released_at": "2026-11-21",
+        "digest": "sha256:8130dc60efea7578575c6b3e19a2812dcb351c75083b5fad486ef348b1dbccae",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/weather-alert-0.1.2/weather-alert-0.1.2.zip"
       }
     ],
     "bili-scroll": [
@@ -62,6 +76,13 @@
         "digest": "sha256:dc2e35934eca2ed0ad1abb5f30f50406bb18b741912d7704599341c8d1fe6d25",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/bili-scroll-0.2.1/bili-scroll-0.2.1.zip"
+      },
+      {
+        "version": "0.2.2",
+        "released_at": "2026-11-21",
+        "digest": "sha256:ebc1e7c3001861faa8398b9870ac83886f99a970b2d8d385137ddc555ed36eeb",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/bili-scroll-0.2.2/bili-scroll-0.2.2.zip"
       }
     ],
     "fishtalk-lite": [
@@ -85,6 +106,13 @@
         "digest": "sha256:c56cf7c2901e162ce1959ba6b75b7625c69875a64b1ee8f2fa353cb24e312d48",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/fishtalk-lite-0.3.0/fishtalk-lite-0.3.0.zip"
+      },
+      {
+        "version": "0.3.1",
+        "released_at": "2026-11-21",
+        "digest": "sha256:aa846f86e44a2ece5e0553f9233737723ac0bb4b2219a3552beef21e3c805b09",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/fishtalk-lite-0.3.1/fishtalk-lite-0.3.1.zip"
       }
     ],
     "auto-chat": [
@@ -129,6 +157,13 @@
         "digest": "sha256:051a34d327c91095464ad8dff137e61b9cfe37007ef28f803ae95a1fd6a8c316",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/auto-chat-0.4.1/auto-chat-0.4.1.zip"
+      },
+      {
+        "version": "0.4.2",
+        "released_at": "2026-11-21",
+        "digest": "sha256:b3e916c3493b40d7ae898cb5e3033145b64a666de58067c58f5d37f027e1bcb0",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/auto-chat-0.4.2/auto-chat-0.4.2.zip"
       }
     ],
     "sticker-album": [
@@ -175,6 +210,13 @@
         "digest": "sha256:1e93e96bc2f8dc93c5be73642ce9b7f60043fa45cdb1db7763ee9f87dbc1f0b7",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/meme-wiki-0.1.1/meme-wiki-0.1.1.zip"
+      },
+      {
+        "version": "0.1.2",
+        "released_at": "2026-11-21",
+        "digest": "sha256:d36379278af36d74eacabfd455d912c66e581983fb9675ecc62d4d53d4eb52c4",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/meme-wiki-0.1.2/meme-wiki-0.1.2.zip"
       }
     ],
     "mood-diary": [
@@ -237,6 +279,13 @@
         "digest": "sha256:f48bdebcdf81bc45707a2eb972e41fdb983f61bed28c74951d8c15de2c83ca7c",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/qzone-composer-0.1.1/qzone-composer-0.1.1.zip"
+      },
+      {
+        "version": "0.1.2",
+        "released_at": "2026-11-21",
+        "digest": "sha256:fcbe864050facf133610a979a48994d5e8dad3337654c875a514e226f7dab67a",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/qzone-composer-0.1.2/qzone-composer-0.1.2.zip"
       }
     ],
     "novel-desk": [
@@ -253,6 +302,13 @@
         "digest": "sha256:7a7497d9b0d129bfefcfc7b3c19202ab0847143b9f5413a403f6491688ba9400",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/novel-desk-0.1.1/novel-desk-0.1.1.zip"
+      },
+      {
+        "version": "0.1.2",
+        "released_at": "2026-11-21",
+        "digest": "sha256:c5afc41305796477fda62b6c5c56d9d1d2e1a3ee383a580ff7dd462ae60f10ec",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/novel-desk-0.1.2/novel-desk-0.1.2.zip"
       }
     ],
     "skill-tree": [
@@ -276,6 +332,13 @@
         "digest": "sha256:a0d76d0730b9f1efb12c8882a98bce16d08027e7ef3dd1fbf3174b0ab2ded957",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/skill-tree-1.0.1/skill-tree-1.0.1.zip"
+      },
+      {
+        "version": "1.0.2",
+        "released_at": "2026-11-21",
+        "digest": "sha256:709e6870396ebb73bd146d28b5955839dd029afb699839638e19371574244d18",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/skill-tree-1.0.2/skill-tree-1.0.2.zip"
       }
     ],
     "weather": [
@@ -370,6 +433,13 @@
         "digest": "sha256:403d4109115c801a3d0633dc26b05eed59a7cec54c093c26558a92945f6dea97",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/group-digest-0.1.0/group-digest-0.1.0.zip"
+      },
+      {
+        "version": "0.1.1",
+        "released_at": "2026-11-21",
+        "digest": "sha256:1e48f6918739f0ac3c150670f83a7f6a32b4669180bc3aa94571f97ba83c6ce6",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/group-digest-0.1.1/group-digest-0.1.1.zip"
       }
     ]
   },

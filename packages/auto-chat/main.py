@@ -26,12 +26,28 @@ autonomy 演进（宿主侧，见 main 仓库 docs/qq-autonomy-design.md）。
 from __future__ import annotations
 
 import datetime as dt
+import inspect
 import math
 import random
 import time
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+
+
+async def sget(ctx: PluginContext, key: str, default=None):
+    """双模式存储读：进程内 sync / 隔离 worker async，同一份插件代码。"""
+    value = ctx.storage.get(key, default)
+    if inspect.isawaitable(value):
+        value = await value
+    return value
+
+
+async def sset(ctx: PluginContext, key: str, value) -> None:
+    result = ctx.storage.set(key, value)
+    if inspect.isawaitable(result):
+        await result
+
 
 CFG_KEY = "sessions"
 SNIPPETS_KEY = "topics"
@@ -115,7 +131,7 @@ class AutoChatPlugin(Plugin):
             # 计数与话题片段都在这里攒——钩子有 caller（可信的会话身份），
             # cron 里没有。原文不落盘：只留前 120 字符的片段。
             session = caller.session_key
-            warmth = ctx.storage.get(WARMTH_KEY) or {}
+            warmth = await sget(ctx, WARMTH_KEY) or {}
             entry = warmth.get(session) or {"count": 0, "last": 0.0}
             if time.time() - entry.get("day_start", 0) > 86400:
                 entry["day_count"] = 0
@@ -124,15 +140,15 @@ class AutoChatPlugin(Plugin):
             entry["last"] = time.time()
             entry["day_count"] = int(entry.get("day_count", 0)) + 1
             warmth[session] = entry
-            ctx.storage.set(WARMTH_KEY, warmth)
+            await sset(ctx, WARMTH_KEY, warmth)
 
-            snippets = ctx.storage.get(SNIPPETS_KEY) or {}
+            snippets = await sget(ctx, SNIPPETS_KEY) or {}
             pieces = [p for p in (snippets.get(session) or []) if isinstance(p, str)]
             snippet = text.strip()[:SNIPPET_CHARS]
             if snippet and snippet not in pieces:
                 pieces = (pieces + [snippet])[-3:]
                 snippets[session] = pieces
-                ctx.storage.set(SNIPPETS_KEY, snippets)
+                await sset(ctx, SNIPPETS_KEY, snippets)
 
         @ctx.command("autochat-set", description="在当前会话开启主动开口，并设温度阈值",
                      usage="/autochat-set [阈值0-1，默认0.6]")
@@ -141,23 +157,23 @@ class AutoChatPlugin(Plugin):
                 threshold = max(0.0, min(1.0, float(args[0]))) if args else WARMTH_FLOOR
             except ValueError:
                 return "阈值要是 0 到 1 之间的小数，例如 /autochat-set 0.6"
-            cfg = ctx.storage.get(CFG_KEY) or {}
+            cfg = await sget(ctx, CFG_KEY) or {}
             cfg[caller.session_key] = {"threshold": threshold, "set_at": time.time()}
-            ctx.storage.set(CFG_KEY, cfg)
+            await sset(ctx, CFG_KEY, cfg)
             return (f"已开启（阈值 {threshold}）。我会按温度和掷骰偶尔自己开口，"
                     "两次之间至少隔 4 小时；/autochat-off 关掉。")
 
         @ctx.command("autochat-off", description="在当前会话关闭主动开口", usage="/autochat-off")
         async def autochat_off(caller: CallerContext, args: list[str]) -> str:
-            cfg = ctx.storage.get(CFG_KEY) or {}
+            cfg = await sget(ctx, CFG_KEY) or {}
             cfg.pop(caller.session_key, None)
-            ctx.storage.set(CFG_KEY, cfg)
+            await sset(ctx, CFG_KEY, cfg)
             return "已关闭。"
 
         @ctx.command("autochat-clear", description="清空话题片段与计数", usage="/autochat-clear")
         async def autochat_clear(caller: CallerContext, args: list[str]) -> str:
-            ctx.storage.set(SNIPPETS_KEY, {})
-            ctx.storage.set(WARMTH_KEY, {})
+            await sset(ctx, SNIPPETS_KEY, {})
+            await sset(ctx, WARMTH_KEY, {})
             return "已清空。"
 
         @ctx.command("autochat-dry", description="演练一次掷骰判定（绝不真发、不改计数）",
@@ -169,15 +185,15 @@ class AutoChatPlugin(Plugin):
             计数。演练结果与真发完全同源，才配叫「演练」。
             """
             session = caller.session_key
-            warmth = ctx.storage.get(WARMTH_KEY) or {}
+            warmth = await sget(ctx, WARMTH_KEY) or {}
             entry = warmth.get(session) or {}
             w = _warmth(int(entry.get("count", 0)), float(entry.get("last", 0)))
-            conf = (ctx.storage.get(CFG_KEY) or {}).get(session)
+            conf = ((await sget(ctx, CFG_KEY)) or {}).get(session)
             enabled = conf is not None
             now_local = dt.datetime.now()
             line = _hit_line(now_local, float(entry.get("last", 0)), int(entry.get("streak", 0)))
             roll = random.randint(0, 99)
-            pieces = [p for p in ((ctx.storage.get(SNIPPETS_KEY) or {}).get(session) or [])
+            pieces = [p for p in (((await sget(ctx, SNIPPETS_KEY)) or {}).get(session) or [])
                       if isinstance(p, str)]
             verdict = "会开口" if (enabled and w >= float((conf or {}).get("threshold", WARMTH_FLOOR))
                                    and roll < line and pieces) else "不会开口"
@@ -190,9 +206,9 @@ class AutoChatPlugin(Plugin):
 
         @ctx.cron("*/30 * * * *", name="auto-chat-tick")
         async def tick() -> None:
-            cfg = ctx.storage.get(CFG_KEY) or {}
-            warmth = ctx.storage.get(WARMTH_KEY) or {}
-            snippets = ctx.storage.get(SNIPPETS_KEY) or {}
+            cfg = await sget(ctx, CFG_KEY) or {}
+            warmth = await sget(ctx, WARMTH_KEY) or {}
+            snippets = await sget(ctx, SNIPPETS_KEY) or {}
             now = time.time()
             now_local = dt.datetime.now()
             quiet = now_local.hour >= QUIET_START_HOUR or now_local.hour < QUIET_END_HOUR
@@ -220,7 +236,7 @@ class AutoChatPlugin(Plugin):
                 if roll >= line:
                     entry["streak"] = int(entry.get("streak", 0)) + 1
                     warmth[session] = entry
-                    ctx.storage.set(WARMTH_KEY, warmth)
+                    await sset(ctx, WARMTH_KEY, warmth)
                     continue
                 entry["streak"] = 0
                 topic = pieces[-1]
@@ -233,9 +249,9 @@ class AutoChatPlugin(Plugin):
                     continue  # 会话失效/未授权：跳过，不改计数
                 # 话题问过即退：同一句话头不被追问第二次（见模块 docstring 第 5 条）。
                 snippets[session] = [p for p in pieces if p != topic]
-                ctx.storage.set(SNIPPETS_KEY, snippets)
+                await sset(ctx, SNIPPETS_KEY, snippets)
                 entry["last_spoke"] = now
                 entry["day_count_spoke"] = int(entry.get("day_count_spoke", 0)) + 1
                 warmth[session] = entry
-                ctx.storage.set(WARMTH_KEY, warmth)
+                await sset(ctx, WARMTH_KEY, warmth)
                 return  # 每轮只挑一个会话

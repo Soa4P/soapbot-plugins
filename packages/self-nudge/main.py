@@ -20,11 +20,27 @@ Capability mapping (why each one is here, and nothing more):
 
 from __future__ import annotations
 
+import inspect
 import time
 import uuid
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+
+
+async def sget(ctx: PluginContext, key: str, default=None):
+    """双模式存储读：进程内 sync / 隔离 worker async，同一份插件代码。"""
+    value = ctx.storage.get(key, default)
+    if inspect.isawaitable(value):
+        value = await value
+    return value
+
+
+async def sset(ctx: PluginContext, key: str, value) -> None:
+    result = ctx.storage.set(key, value)
+    if inspect.isawaitable(result):
+        await result
+
 
 STATE_KEY = "nudges"
 MAX_ITEMS = 100
@@ -71,7 +87,7 @@ class SelfNudgePlugin(Plugin):
             if when is None:
                 return f"看不懂时间 {args[0]!r}；支持 30m / 2h / HH:MM"
             note = " ".join(args[1:]).strip()
-            items = ctx.storage.get(STATE_KEY) or []
+            items = await sget(ctx, STATE_KEY) or []
             if not isinstance(items, list):
                 items = []
             if len(items) >= MAX_ITEMS:
@@ -83,7 +99,7 @@ class SelfNudgePlugin(Plugin):
                 "session_key": caller.session_key,
                 "created_at": _now(),
             })
-            ctx.storage.set(STATE_KEY, items)
+            await sset(ctx, STATE_KEY, items)
             import datetime as dt
 
             local = dt.datetime.fromtimestamp(when).strftime("%m-%d %H:%M")
@@ -91,7 +107,7 @@ class SelfNudgePlugin(Plugin):
 
         @ctx.command("nudge-list", description="看现在还挂着几个约", usage="/nudge-list")
         async def nudge_list(caller: CallerContext, args: list[str]) -> str:
-            items = [i for i in (ctx.storage.get(STATE_KEY) or []) if isinstance(i, dict)]
+            items = [i for i in ((await sget(ctx, STATE_KEY)) or []) if isinstance(i, dict)]
             if not items:
                 return "现在没有挂着任何约。"
             import datetime as dt
@@ -104,7 +120,7 @@ class SelfNudgePlugin(Plugin):
 
         @ctx.command("nudge-clear", description="清空全部约（删了找不回来）", usage="/nudge-clear")
         async def nudge_clear(caller: CallerContext, args: list[str]) -> str:
-            ctx.storage.set(STATE_KEY, [])
+            await sset(ctx, STATE_KEY, [])
             return "已清空。"
 
         @ctx.cron("* * * * *", name="self-nudge-tick")
@@ -114,7 +130,7 @@ class SelfNudgePlugin(Plugin):
             发送失败不删条目——下一次 tick 会再试。与 original 的 --take 语义一致：
             只有确实取走（投递成功）才从队列移除。
             """
-            items = ctx.storage.get(STATE_KEY) or []
+            items = await sget(ctx, STATE_KEY) or []
             if not isinstance(items, list):
                 return
             now = _now()
@@ -132,4 +148,4 @@ class SelfNudgePlugin(Plugin):
                 except (PermissionError, RuntimeError, ValueError):
                     remaining.append(item)  # 下一个 tick 重试
                     continue
-            ctx.storage.set(STATE_KEY, remaining)
+            await sset(ctx, STATE_KEY, remaining)

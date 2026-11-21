@@ -1,5 +1,5 @@
 name: skill-tree
-version: 1.0.1
+version: 1.0.2
 entry: main:SkillTreePlugin
 description: 学习追踪技能树（1.0.0 加复习提醒：cron+send，MAJOR）。／tree-add 建技能（必须／推荐前置分层，加前置当场拒环）、／tree-done
   点亮（必须前置未齐硬拒绝、推荐只提示）、／tree 看全树、进度导出导入（保守合并：已有点亮不被覆盖）。改编自 zeroa234／cs-math-skill-tree

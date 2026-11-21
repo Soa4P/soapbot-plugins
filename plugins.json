@@ -5,10 +5,11 @@
   "plugins": [
     {
       "name": "self-nudge",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "versions": [
         "0.1.0",
-        "0.1.1"
+        "0.1.1",
+        "0.1.2"
       ],
       "summary": "给未来的自己留一句话，到点在原会话自己开口。改编自 not-zai/self-nudge。",
       "author": "Soa4P",
@@ -17,10 +18,11 @@
     },
     {
       "name": "weather-alert",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "versions": [
         "0.1.0",
-        "0.1.1"
+        "0.1.1",
+        "0.1.2"
       ],
       "summary": "中央气象台预警按配置省抓取，新预警播报到配置会话。改编自 not-zai/weather-watch。",
       "author": "Soa4P",
@@ -29,12 +31,13 @@
     },
     {
       "name": "bili-scroll",
-      "latest": "0.2.1",
+      "latest": "0.2.2",
       "versions": [
         "0.1.0",
         "0.1.1",
         "0.2.0",
-        "0.2.1"
+        "0.2.1",
+        "0.2.2"
       ],
       "summary": "每天刷一轮 B 站：标题初筛 + 字幕原文加权判断（宿主字幕面），日报「### BV号 + 为什么值得」推给你。只读，不点赞不评论不关注。",
       "author": "Soa4P",
@@ -43,11 +46,12 @@
     },
     {
       "name": "fishtalk-lite",
-      "latest": "0.3.0",
+      "latest": "0.3.1",
       "versions": [
         "0.1.0",
         "0.1.1",
-        "0.3.0"
+        "0.3.0",
+        "0.3.1"
       ],
       "summary": "收 B 站视频语料，发话前做八股检查。改编自 fishtalk 的 collect/check/forget。",
       "author": "Soa4P",
@@ -56,14 +60,15 @@
     },
     {
       "name": "auto-chat",
-      "latest": "0.4.1",
+      "latest": "0.4.2",
       "versions": [
         "0.1.0",
         "0.1.1",
         "0.2.0",
         "0.3.0",
         "0.4.0",
-        "0.4.1"
+        "0.4.1",
+        "0.4.2"
       ],
       "summary": "在被开启的会话里偶尔自己开口：温度阈值 + 频率硬上限 + 话题片段 + 本地掷骰（峰谷/连败补偿）+ 话题问过即退。",
       "author": "Soa4P",
@@ -86,10 +91,11 @@
     },
     {
       "name": "meme-wiki",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "versions": [
         "0.1.0",
-        "0.1.1"
+        "0.1.1",
+        "0.1.2"
       ],
       "summary": "网络梗词典：查梗、自建词条、同步 cnmeme.wiki 词库。改编自 dsh-memewiki。",
       "author": "Soa4P",
@@ -124,10 +130,11 @@
     },
     {
       "name": "qzone-composer",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "versions": [
         "0.1.0",
-        "0.1.1"
+        "0.1.1",
+        "0.1.2"
       ],
       "summary": "QQ 空间素材草稿助手：每天从允许列表 RSS 抓素材、脱敏起草一句话，提醒后人工 /qzc-confirm 发布（三重确认最后一道）。改编自 dsh-qzone，不自动发帖。",
       "author": "Soa4P",
@@ -136,10 +143,11 @@
     },
     {
       "name": "novel-desk",
-      "latest": "0.1.1",
+      "latest": "0.1.2",
       "versions": [
         "0.1.0",
-        "0.1.1"
+        "0.1.1",
+        "0.1.2"
       ],
       "summary": "私密小说写作台：设定卡与章节草稿存加密 storage，/nd-search 检索设定、/nd-ch-undo 恢复旧稿。改编自 dsh-cuigengji-plugin。",
       "author": "Soa4P",
@@ -148,11 +156,12 @@
     },
     {
       "name": "skill-tree",
-      "latest": "1.0.1",
+      "latest": "1.0.2",
       "versions": [
         "0.1.0",
         "1.0.0",
-        "1.0.1"
+        "1.0.1",
+        "1.0.2"
       ],
       "summary": "学习追踪技能树：前置锁定、点亮即声明、复习提醒（cron+send）。改编自 cs-math-skill-tree。",
       "author": "Soa4P",
@@ -161,9 +170,10 @@
     },
     {
       "name": "group-digest",
-      "latest": "0.1.0",
+      "latest": "0.1.1",
       "versions": [
-        "0.1.0"
+        "0.1.0",
+        "0.1.1"
       ],
       "summary": "群活跃度统计：消息钩子攒每日与时段计数、活跃成员（只存计数不存文本，14 天滚动），／digest-now 现算概览，／digest-reset 清空。改编自 AstrBot 群分析总结的确定性残量。",
       "author": "soapbot-plugins",
