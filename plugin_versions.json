@@ -194,6 +194,13 @@
         "digest": "sha256:a01a3e48caa777b59444cce293a05d21ca3cabb3375be9a9f0a0b91c334f7fb5",
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/sticker-album-1.0.0/sticker-album-1.0.0.zip"
+      },
+      {
+        "version": "1.0.1",
+        "released_at": "2026-11-21",
+        "digest": "sha256:c89f274a8345863145b2abfa8c7e85b35f9cc6b5b7866036348d08e1611a5ac5",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/sticker-album-1.0.1/sticker-album-1.0.1.zip"
       }
     ],
     "meme-wiki": [
