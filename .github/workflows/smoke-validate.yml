@@ -48,3 +48,9 @@ jobs:
 
       - name: Smoke
         run: python scripts/smoke_validate.py --plugins "${{ env.PLUGINS || inputs.plugins || '' }}"
+
+      # 功能级冒烟：装载只证「能加载」；这一步证「装上了真能跑」——每包真驱动
+      # 存储触碰型命令（隔离 worker + 加密存储）。无 PLAN 条目的包记 skip 不算
+      # 失败；新增插件需在 scripts/func_smoke.py 的 PLAN 登记一行。
+      - name: Functional smoke
+        run: python scripts/func_smoke.py --plugins "${{ env.PLUGINS || inputs.plugins || '' }}"
