@@ -39,6 +39,8 @@ PLAN: dict[str, list[tuple[str, list[str]]]] = {
     "skill-tree": [("tree-add", ["python", "Python 建树测试"]), ("tree-done", ["python"]), ("tree", [])],
     "group-digest": [("digest-now", []), ("digest-reset", [])],
     "sticker-album": [("meme-packs", []), ("meme-stats", [])],
+    "memory-weekly": [("memweek", [])],
+    "mood-diary": [("mood-on", []), ("mood", []), ("mood-forget", [])],
 }
 
 # 有消息钩子的包：功能冒烟顺带真发一条，钩子里的 storage 写也要活着。
