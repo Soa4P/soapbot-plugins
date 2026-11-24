@@ -77,7 +77,7 @@ def main(index_dir: Path) -> int:
         if not path.is_file():
             print(f"signed file is missing: {name}", file=sys.stderr)
             return 1
-        actual = "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+        actual = "sha256:" + hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
         if actual != expected:
             print(f"{name} was modified after signing (re-sign the index)", file=sys.stderr)
             return 1

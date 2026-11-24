@@ -1,10 +1,10 @@
 {
   "algorithm": "ed25519",
   "covers": {
-    "plugin_versions.json": "sha256:5f517c92f7194fc5cd9dc2c7c3e1dd3e6901df0ab72033756b2c9d82ea269238",
-    "plugins.json": "sha256:742b8aa206f2b6b4c3ea448dfa9108403899199ce9c50c1d2b54dc931c51c939"
+    "plugin_versions.json": "sha256:b8c545d04af86fbc3dc7f89d9e258a555ad36de89637e74d51d957be64d7ccbc",
+    "plugins.json": "sha256:354fdaba2baecdff4fcfd7448927c89514ce4e80a4b424e8488872bca3ce2d6a"
   },
   "key_id": "c74ba4090e4ea9ca",
-  "signature": "sjXqDqgkI25kRYjiUMKkb5dllZDwgtVV/0zuIfnQhOZrQvuDuFWDbwUA52x6zYwWCXtuMuASFFAhb88JcQtDAA==",
+  "signature": "9N+N7R+ZAxiDJMybWQx0se/j4Eg7bXFoKsYSqJN36jycv7F+PsBrpJ5pr59hzvc1QqaHFCNm62PK/52k8NJXAg==",
   "version": 1
 }
