@@ -1,0 +1,10 @@
+{
+  "algorithm": "ed25519",
+  "covers": {
+    "plugin_versions.json": "sha256:5f517c92f7194fc5cd9dc2c7c3e1dd3e6901df0ab72033756b2c9d82ea269238",
+    "plugins.json": "sha256:742b8aa206f2b6b4c3ea448dfa9108403899199ce9c50c1d2b54dc931c51c939"
+  },
+  "key_id": "c74ba4090e4ea9ca",
+  "signature": "sjXqDqgkI25kRYjiUMKkb5dllZDwgtVV/0zuIfnQhOZrQvuDuFWDbwUA52x6zYwWCXtuMuASFFAhb88JcQtDAA==",
+  "version": 1
+}

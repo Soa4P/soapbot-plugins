@@ -61,6 +61,22 @@ python scripts/validate_index.py
 
 CI 还有第二个 job（`code`），它检查的不是「现在自洽吗」而是「这次改动安全吗」：`download` 必须指向本仓库对应 `name-version` 的 release 路径、已发布版本的 `digest`/`download`/`released_at` 不可修改（要改就发新版本）、封禁与归档只增不减、`trusted_developers.json` 变更必须单独开 PR。
 
+## 索引签名
+
+`index.sig.json` 是对 `plugins.json` 与 `plugin_versions.json` 的分离签名。soapbot 侧
+内嵌公钥、一键安装要求签名有效——这样"改索引"不再等于"改可安装内容"。
+
+- **贡献者不需要碰它**：普通 PR 只动插件包与详情，索引由维护者在合并后重新生成并签名。
+- **维护者改了索引 JSON 就要重签**，否则 CI 的 `signature` job 红：
+
+```bash
+python scripts/verify_index_signature.py .   # 校验（CI 同款，无需私钥）
+```
+
+签名本身由 soapbot 仓库的 `scripts/sign_plugin_index.py` 用离线私钥完成
+（私钥不在任何仓库、不在 CI；操作步骤见 soapbot 的 `docs/plugin-index-signing.md`）。
+
+
 ## AI 审查与自动合并
 
 PR 会多一条 AI 评论，判 `safe` / `needs_review` / `malicious` 并说明理由。它按这个仓库的风险来判：不是「插件代码有没有后门」（代码不在这里），而是「这次改动有没有动 `digest` / `download` / `versions`，有没有让用户下载到别处」。
