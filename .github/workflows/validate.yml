@@ -18,6 +18,24 @@ jobs:
       - name: Cross-file consistency
         run: python scripts/validate_index.py
 
+  signature:
+    # The catalogue decides what a bot can install. Its digest chain makes a swapped
+    # *download* fail; this job is what makes a swapped *catalogue* detectable at all.
+    # It also fails when the JSON changed without re-signing, which is the only way the
+    # signature stays meaningful.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # The only job here with a dependency: Ed25519 verification is not in the stdlib.
+      # Pinned like every other runtime pin in the two repositories.
+      - name: Install cryptography
+        run: python -m pip install --disable-pip-version-check "cryptography==50.0.2"
+      - name: Index signature
+        run: python scripts/verify_index_signature.py .
+
   code:
     # `index` proves the files agree with each other. This proves the *change* is safe:
     # rewriting a published digest, pointing `download` at another repository, or

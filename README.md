@@ -12,6 +12,10 @@ soapbot 的社区插件索引。
 
 - **索引负责发现**：有哪些插件、有哪些版本、作者声称它做什么。
 - **本地负责信任**：下载、上传、逐项勾选能力、记录 digest。少一步都装不上。
+- **签名负责溯源**：`index.sig.json` 是对 `plugins.json` + `plugin_versions.json` 的
+  分离签名（Ed25519）。digest 挡住"下载包被换"，签名挡住"索引本身被换"——否则改索引的
+  人可以声明自己的 digest，下游检查全部同意。soapbot 侧公钥内嵌、一键安装要求签名有效；
+  发现与手工上传不受影响。
 
 `blocked_versions.json` 是唯一的例外方向——索引可以**加**封禁，不能**减**。soapbot 自己也带一份封禁表随版本发布，两份合并使用。
 
@@ -22,9 +26,14 @@ soapbot 的社区插件索引。
 | `plugins.json` | 插件列表与版本号，soapbot 每次打开插件页会拉这个 |
 | `plugin_details.json` | 长描述、能力声明、README 路径 |
 | `plugin_versions.json` | 每个版本的发布日期、digest、最低宿主版本、下载地址 |
+| `index.sig.json` | 上述两个文件的分离签名（Ed25519，公钥在 soapbot 侧） |
 | `blocked_versions.json` | 禁止安装的版本与原因 |
 | `archived_plugins.json` | 停止维护的插件 |
 | `trusted_developers.json` | 作者显示提示，不改变任何安装门槛 |
+
+**改了 `plugins.json` / `plugin_versions.json` 就必须重新签名**，否则 CI 的
+`signature` 任务会红（这是刻意的：签名只在"每次字节变化都重签"时才有意义）。维护者
+操作见 [CONTRIBUTING.md](CONTRIBUTING.md) 的签名小节。
 
 ## 在 soapbot 里启用
 
