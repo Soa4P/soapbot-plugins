@@ -33,6 +33,7 @@ import time
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+from soapbot.security.principal import Role
 
 
 async def sget(ctx: PluginContext, key: str, default=None):
@@ -70,7 +71,10 @@ class WeatherAlertPlugin(Plugin):
     async def setup(self, ctx: PluginContext) -> None:
         await super().setup(ctx)
 
-        @ctx.command("weather-set", description="配置预警关注的省份与经纬度", usage="/weather-set <省份名> <纬度> <经度>")
+        # 全局配置（唯一一份，含投递会话）与共享去重表——此前任意群成员可把预警
+        # 改发到自己的群（S-SUP-06），因此这三个写命令要求 bot 管理员。
+        @ctx.command("weather-set", description="配置预警关注的省份与经纬度（仅 bot 管理员）",
+                     usage="/weather-set <省份名> <纬度> <经度>", min_role=Role.ADMIN)
         async def weather_set(caller: CallerContext, args: list[str]) -> str:
             if len(args) < 3:
                 return "用法：/weather-set 北京市 39.90 116.40"
@@ -122,7 +126,8 @@ class WeatherAlertPlugin(Plugin):
                 return "没有未播报的预警。"
             return "未播报的预警：\n" + "\n".join(f"- {t}" for t in fresh)
 
-        @ctx.command("weather-ack", description="把当前预警标记为已说", usage="/weather-ack")
+        @ctx.command("weather-ack", description="把当前预警标记为已说", usage="/weather-ack",
+                     min_role=Role.ADMIN)
         async def weather_ack(caller: CallerContext, args: list[str]) -> str:
             cfg = await sget(ctx, CFG_KEY) or {}
             spoken = await sget(ctx, SPOKEN_KEY) or []
@@ -130,7 +135,8 @@ class WeatherAlertPlugin(Plugin):
             await _mark_spoken(ctx, fresh)
             return f"已标记 {len(fresh)} 条为已说。"
 
-        @ctx.command("weather-clear", description="清空去重记录", usage="/weather-clear")
+        @ctx.command("weather-clear", description="清空去重记录", usage="/weather-clear",
+                     min_role=Role.ADMIN)
         async def weather_clear(caller: CallerContext, args: list[str]) -> str:
             await sset(ctx, SPOKEN_KEY, [])
             return "已清空去重记录。"

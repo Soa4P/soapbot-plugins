@@ -1,5 +1,5 @@
 name: sticker-album
-version: 1.0.1
+version: 2.0.0
 entry: main:StickerAlbumPlugin
 description: 表情包能力面：多包管理的表情相册（每张图带包名，每包 100 张上限，SHA-256 去重），meme-save 与 meme-keep
   两条入库路不变（http 白名单加 media_observe），meme-send 走 send_media 审批链；新增模型工具 meme-pick——模型按对话语境从图库选表情并直接发送到当前会话（确定性打分，不回传图片本体）；meme-search

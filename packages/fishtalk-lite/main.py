@@ -22,6 +22,7 @@ import re
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+from soapbot.security.principal import Role
 
 
 async def sget(ctx: PluginContext, key: str, default=None):
@@ -174,8 +175,8 @@ class FishTalkLitePlugin(Plugin):
             head = decoded[:1200]
             return f"解出 {len(decoded)} 字：\n{head}"
 
-        @ctx.command("fish-forget", description="全部忘掉（必须确认，删了找不回来）",
-                     usage="/fish-forget 确认")
+        @ctx.command("fish-forget", description="全部忘掉（仅 bot 管理员，删了找不回来）",
+                     usage="/fish-forget 确认", min_role=Role.ADMIN)
         async def forget(caller: CallerContext, args: list[str]) -> str:
             if args[:1] != ["确认"]:
                 return "这会清空全部语料且找不回来。确定的话：/fish-forget 确认"

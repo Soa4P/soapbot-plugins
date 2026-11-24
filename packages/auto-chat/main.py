@@ -33,6 +33,7 @@ import time
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+from soapbot.security.principal import Role
 
 
 async def sget(ctx: PluginContext, key: str, default=None):
@@ -150,8 +151,10 @@ class AutoChatPlugin(Plugin):
                 snippets[session] = pieces
                 await sset(ctx, SNIPPETS_KEY, snippets)
 
-        @ctx.command("autochat-set", description="在当前会话开启主动开口，并设温度阈值",
-                     usage="/autochat-set [阈值0-1，默认0.6]")
+        # 开关的是「bot 在这个群主动开口」——群级行为变更与清空本会话片段，要求
+        # bot 管理员（S-SUP-06：此前任意群成员都能开启/关闭）。
+        @ctx.command("autochat-set", description="在当前会话开启主动开口（仅 bot 管理员）",
+                     usage="/autochat-set [阈值0-1，默认0.6]", min_role=Role.ADMIN)
         async def autochat_set(caller: CallerContext, args: list[str]) -> str:
             try:
                 threshold = max(0.0, min(1.0, float(args[0]))) if args else WARMTH_FLOOR
@@ -163,14 +166,16 @@ class AutoChatPlugin(Plugin):
             return (f"已开启（阈值 {threshold}）。我会按温度和掷骰偶尔自己开口，"
                     "两次之间至少隔 4 小时；/autochat-off 关掉。")
 
-        @ctx.command("autochat-off", description="在当前会话关闭主动开口", usage="/autochat-off")
+        @ctx.command("autochat-off", description="在当前会话关闭主动开口", usage="/autochat-off",
+                     min_role=Role.ADMIN)
         async def autochat_off(caller: CallerContext, args: list[str]) -> str:
             cfg = await sget(ctx, CFG_KEY) or {}
             cfg.pop(caller.session_key, None)
             await sset(ctx, CFG_KEY, cfg)
             return "已关闭。"
 
-        @ctx.command("autochat-clear", description="清空话题片段与计数", usage="/autochat-clear")
+        @ctx.command("autochat-clear", description="清空话题片段与计数", usage="/autochat-clear",
+                     min_role=Role.ADMIN)
         async def autochat_clear(caller: CallerContext, args: list[str]) -> str:
             await sset(ctx, SNIPPETS_KEY, {})
             await sset(ctx, WARMTH_KEY, {})

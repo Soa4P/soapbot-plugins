@@ -5,11 +5,12 @@
   "plugins": [
     {
       "name": "self-nudge",
-      "latest": "0.1.2",
+      "latest": "0.2.0",
       "versions": [
         "0.1.0",
         "0.1.1",
-        "0.1.2"
+        "0.1.2",
+        "0.2.0"
       ],
       "summary": "给未来的自己留一句话，到点在原会话自己开口。改编自 not-zai/self-nudge。",
       "author": "Soa4P",
@@ -18,11 +19,12 @@
     },
     {
       "name": "weather-alert",
-      "latest": "0.1.2",
+      "latest": "0.2.0",
       "versions": [
         "0.1.0",
         "0.1.1",
-        "0.1.2"
+        "0.1.2",
+        "0.2.0"
       ],
       "summary": "中央气象台预警按配置省抓取，新预警播报到配置会话。改编自 not-zai/weather-watch。",
       "author": "Soa4P",
@@ -46,12 +48,13 @@
     },
     {
       "name": "fishtalk-lite",
-      "latest": "0.3.1",
+      "latest": "0.4.0",
       "versions": [
         "0.1.0",
         "0.1.1",
         "0.3.0",
-        "0.3.1"
+        "0.3.1",
+        "0.4.0"
       ],
       "summary": "收 B 站视频语料，发话前做八股检查。改编自 fishtalk 的 collect/check/forget。",
       "author": "Soa4P",
@@ -60,7 +63,7 @@
     },
     {
       "name": "auto-chat",
-      "latest": "0.4.2",
+      "latest": "0.5.0",
       "versions": [
         "0.1.0",
         "0.1.1",
@@ -68,7 +71,8 @@
         "0.3.0",
         "0.4.0",
         "0.4.1",
-        "0.4.2"
+        "0.4.2",
+        "0.5.0"
       ],
       "summary": "在被开启的会话里偶尔自己开口：温度阈值 + 频率硬上限 + 话题片段 + 本地掷骰（峰谷/连败补偿）+ 话题问过即退。",
       "author": "Soa4P",
@@ -77,13 +81,14 @@
     },
     {
       "name": "sticker-album",
-      "latest": "1.0.1",
+      "latest": "2.0.0",
       "versions": [
         "0.1.0",
         "0.1.1",
         "0.2.0",
         "1.0.0",
-        "1.0.1"
+        "1.0.1",
+        "2.0.0"
       ],
       "summary": "机器人自己的表情包相册：存/按标签找/发出去（需 send_media 能力）。",
       "author": "Soa4P",
@@ -131,11 +136,12 @@
     },
     {
       "name": "qzone-composer",
-      "latest": "0.1.2",
+      "latest": "0.2.0",
       "versions": [
         "0.1.0",
         "0.1.1",
-        "0.1.2"
+        "0.1.2",
+        "0.2.0"
       ],
       "summary": "QQ 空间素材草稿助手：每天从允许列表 RSS 抓素材、脱敏起草一句话，提醒后人工 /qzc-confirm 发布（三重确认最后一道）。改编自 dsh-qzone，不自动发帖。",
       "author": "Soa4P",

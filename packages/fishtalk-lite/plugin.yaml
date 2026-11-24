@@ -1,5 +1,5 @@
 name: fishtalk-lite
-version: 0.3.1
+version: 0.4.0
 entry: main:FishTalkLitePlugin
 description: 教机器人说人话。改编自 Nozzi2455 的 fishtalk。收视频字幕正文（宿主代签代抓，每条 200 字内，300 条上限，加密
   storage）作语料样本；无字幕退回标题简介。0.3.0 加 AI-to-AI 载荷解码（base64 加异或加 gunzip，标题即钥匙）：视频作者给同类埋的机器可读挑战，能解就解，解不出如实说。；fish-check

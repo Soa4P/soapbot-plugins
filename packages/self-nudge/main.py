@@ -26,6 +26,7 @@ import uuid
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+from soapbot.security.principal import Role
 
 
 async def sget(ctx: PluginContext, key: str, default=None):
@@ -118,7 +119,8 @@ class SelfNudgePlugin(Plugin):
                 lines.append(f"- {local}　{item.get('note', '')}")
             return "还挂着的约：\n" + "\n".join(lines)
 
-        @ctx.command("nudge-clear", description="清空全部约（删了找不回来）", usage="/nudge-clear")
+        @ctx.command("nudge-clear", description="清空全部约（仅 bot 管理员，删了找不回来）",
+                     usage="/nudge-clear", min_role=Role.ADMIN)
         async def nudge_clear(caller: CallerContext, args: list[str]) -> str:
             await sset(ctx, STATE_KEY, [])
             return "已清空。"

@@ -1,5 +1,5 @@
 name: self-nudge
-version: 0.1.2
+version: 0.2.0
 entry: main:SelfNudgePlugin
 description: 让机器人给未来的自己留一句话，到点自己开口。改编自 not-zai 的 self-nudge。只读本插件加密 storage 的留言列表；投递只发回发起命令的那个会话；留言（时间加内容加目标会话）存加密
   storage，投递成功即删，nudge-list 可查看，nudge-clear 全清，不写文件到插件目录之外。

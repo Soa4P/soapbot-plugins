@@ -44,6 +44,17 @@ PLAN: dict[str, list[tuple[str, list[str]]]] = {
 # 有消息钩子的包：功能冒烟顺带真发一条，钩子里的 storage 写也要活着。
 HOOKS_TO_FIRE = {"auto-chat"}
 
+# 必须声明 min_role=ADMIN 的命令（S-SUP-06）：改全局配置、开关群级行为、写外部
+# 账号、清空跨会话共享数据。插件命令默认 MEMBER——不显式收紧就是任何群成员可调。
+ADMIN_ONLY: dict[str, set[str]] = {
+    "qzone-composer": {"qzc-set", "qzc-off", "qzc-confirm", "qzc-drop"},
+    "weather-alert": {"weather-set", "weather-ack", "weather-clear"},
+    "auto-chat": {"autochat-set", "autochat-off", "autochat-clear"},
+    "fishtalk-lite": {"fish-forget"},
+    "self-nudge": {"nudge-clear"},
+    "sticker-album": {"meme-forget"},
+}
+
 
 def _caller():
     from soapbot.plugins.context import CallerContext
@@ -74,6 +85,15 @@ async def run_package(name: str, temp: str, fails: list[str]) -> None:
     loader.approve_from_manifest(manifest)
     loaded = await loader.load(name, force=True)
     try:
+        # 宿主侧读命令表（dispatch 用的就是它），确认敏感命令真的声明了 ADMIN——
+        # 注释里写 "仅 bot 管理员" 不算数。
+        for cmd in sorted(ADMIN_ONLY.get(name, ())):
+            meta = loaded.context.commands.get(cmd) or {}
+            declared = str(meta.get("min_role") or "").lower()
+            ok = declared == "admin"
+            print(f"[{'ok  ' if ok else 'FAIL'}] {name} /{cmd} min_role={declared or '(member)'}")
+            if not ok:
+                fails.append(f"{name}/{cmd}/min_role")
         for cmd, args in PLAN[name]:
             try:
                 out = await loaded.worker.invoke(cmd, caller=_caller(), args=args)
