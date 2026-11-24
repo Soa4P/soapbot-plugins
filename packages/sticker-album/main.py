@@ -64,6 +64,7 @@ from collections import Counter
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+from soapbot.security.principal import Role
 
 MAX_ITEMS_PER_PACK = 100
 DEFAULT_PACK = "default"
@@ -237,8 +238,10 @@ class StickerAlbumPlugin(Plugin):
                     return f"已删 #{args[0]}（包：{pack}）。"
             return f"没有 #{args[0]} 这张。"
 
-        @ctx.command("meme-forget", description="清空相册（可只清一个包，必须确认）",
-                     usage="/meme-forget [包] 确认")
+        # 相册是跨会话共享的（按包存在插件命名空间，不按会话隔离），清空要求
+        # bot 管理员（S-SUP-06）。
+        @ctx.command("meme-forget", description="清空相册（仅 bot 管理员，必须确认）",
+                     usage="/meme-forget [包] 确认", min_role=Role.ADMIN)
         async def meme_forget(caller: CallerContext, args: list[str]) -> str:
             pack = DEFAULT_PACK
             if args and args[0] != "确认":

@@ -28,6 +28,7 @@ import xml.etree.ElementTree as ET
 
 from soapbot.plugins.base import Plugin
 from soapbot.plugins.context import CallerContext, PluginContext
+from soapbot.security.principal import Role
 
 
 async def sget(ctx: PluginContext, key: str, default=None):
@@ -83,8 +84,11 @@ class QzoneComposerPlugin(Plugin):
     async def setup(self, ctx: PluginContext) -> None:
         await super().setup(ctx)
 
-        @ctx.command("qzc-set", description="开启每日素材草稿（当前会话接收提醒并确认发布）",
-                     usage="/qzc-set")
+        # 发布链路的四个命令全部要求 bot 管理员（S-SUP-02）：写的是操作者**个人**
+        # QQ 空间，此前任何群成员都能 /qzc-draft-now + /qzc-confirm 替他发帖
+        # （confirm 是插件自填的布尔值，宿主没有独立人工确认票据）。
+        @ctx.command("qzc-set", description="开启每日素材草稿（仅 bot 管理员）",
+                     usage="/qzc-set", min_role=Role.ADMIN)
         async def qzc_set(caller: CallerContext, args: list[str]) -> str:
             cfg = await sget(ctx, CFG_KEY) or {}
             cfg[caller.session_key] = {"set_at": time.time()}
@@ -95,7 +99,8 @@ class QzoneComposerPlugin(Plugin):
                 "素材源域名请先加进 http 允许列表。"
             )
 
-        @ctx.command("qzc-off", description="关闭每日草稿", usage="/qzc-off")
+        @ctx.command("qzc-off", description="关闭每日草稿", usage="/qzc-off",
+                     min_role=Role.ADMIN)
         async def qzc_off(caller: CallerContext, args: list[str]) -> str:
             cfg = await sget(ctx, CFG_KEY) or {}
             cfg.pop(caller.session_key, None)
@@ -106,8 +111,8 @@ class QzoneComposerPlugin(Plugin):
         async def draft_now(caller: CallerContext, args: list[str]) -> str:
             return await self._draft(ctx, str(caller.session_key), manual=True)
 
-        @ctx.command("qzc-confirm", description="确认发布当前草稿（三重确认的最后一道）",
-                     usage="/qzc-confirm")
+        @ctx.command("qzc-confirm", description="确认发布当前草稿（仅 bot 管理员）",
+                     usage="/qzc-confirm", min_role=Role.ADMIN)
         async def qzc_confirm(caller: CallerContext, args: list[str]) -> str:
             draft = await sget(ctx, DRAFT_KEY) or {}
             entry = draft.get(caller.session_key)
@@ -133,7 +138,8 @@ class QzoneComposerPlugin(Plugin):
             await sset(ctx, DRAFT_KEY, draft)
             return f"已发布：{str(entry['text'])[:50]}"
 
-        @ctx.command("qzc-drop", description="放弃当前草稿", usage="/qzc-drop")
+        @ctx.command("qzc-drop", description="放弃当前草稿", usage="/qzc-drop",
+                     min_role=Role.ADMIN)
         async def qzc_drop(caller: CallerContext, args: list[str]) -> str:
             draft = await sget(ctx, DRAFT_KEY) or {}
             draft.pop(caller.session_key, None)
