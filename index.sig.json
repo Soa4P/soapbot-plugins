@@ -1,10 +1,11 @@
 {
   "algorithm": "ed25519",
   "covers": {
+    "archived_plugins.json": "sha256:3e9f5fdc9513791c3912e6ccd205e8de10c5a13ac5d6ccfd0a7b1f8e87251160",
     "plugin_versions.json": "sha256:b8c545d04af86fbc3dc7f89d9e258a555ad36de89637e74d51d957be64d7ccbc",
     "plugins.json": "sha256:354fdaba2baecdff4fcfd7448927c89514ce4e80a4b424e8488872bca3ce2d6a"
   },
   "key_id": "c74ba4090e4ea9ca",
-  "signature": "9N+N7R+ZAxiDJMybWQx0se/j4Eg7bXFoKsYSqJN36jycv7F+PsBrpJ5pr59hzvc1QqaHFCNm62PK/52k8NJXAg==",
+  "signature": "6nN8Ey1Tsa2uxAqUwJXlotyaTEI0ZgTXlmwqzo9cQm4OAVsBDmwvkGEdZSlYD0oSO7QXJUUjk67GG0BnRfZoCA==",
   "version": 1
 }
