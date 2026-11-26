@@ -1,9 +1,26 @@
 name: validate
 
+# Two questions, two kinds of job:
+#   * does this repository's data agree with itself        (`index`, `code`, `signature`)
+#   * is the published release what this repository says   (`assets`)
+#
+# Provenance rule for everything below: on a pull request, the *validator* is taken from
+# the base commit, not from the PR. A PR that weakens a script and then passes its own
+# checks is the gap audit S-SUP-05 named — the data may come from the PR, the code that
+# judges it may not.
+
 on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    # Weekly: a published asset can change without anything in this repository moving
+    # (a re-upload, a deleted release). Nothing else would notice (audit S-SUP-09).
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   index:
@@ -13,10 +30,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      # On a PR, fetch the base validator: the PR's own copy of this script is data under
+      # review, not the judge.
+      - name: Fetch the base validator (PRs only)
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: .base
       # No dependencies on purpose: the validator is stdlib-only so this job cannot fail
       # because a package index was slow. A red badge here must mean the index is wrong.
       - name: Cross-file consistency
-        run: python scripts/validate_index.py
+        run: |
+          validator=scripts/validate_index.py
+          if [ -f .base/scripts/validate_index.py ]; then
+            echo "using the base commit's validator"
+            validator=.base/scripts/validate_index.py
+          fi
+          python "$validator"
 
   signature:
     # The catalogue decides what a bot can install. Its digest chain makes a swapped
@@ -29,12 +60,26 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Fetch the base verifier (PRs only)
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: .base
       # The only job here with a dependency: Ed25519 verification is not in the stdlib.
       # Pinned like every other runtime pin in the two repositories.
       - name: Install cryptography
         run: python -m pip install --disable-pip-version-check "cryptography==50.0.2"
       - name: Index signature
-        run: python scripts/verify_index_signature.py .
+        run: |
+          verifier=scripts/verify_index_signature.py
+          if [ -f .base/scripts/verify_index_signature.py ]; then
+            echo "using the base commit's verifier"
+            verifier=.base/scripts/verify_index_signature.py
+          fi
+          # The verifier reads the index from the *working tree* either way: only the code
+          # is pinned, the data is what is being reviewed.
+          python "$verifier" .
 
   code:
     # `index` proves the files agree with each other. This proves the *change* is safe:
@@ -57,3 +102,26 @@ jobs:
           # pull_request carries base.sha; a push to main carries before.
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: python scripts/check_index_integrity.py --base "$BASE_SHA"
+
+  assets:
+    # Independent verification of what is actually published (audit S-SUP-09): the digest
+    # in the index is computed by the publisher's own script, so on its own it only proves
+    # the upload was self-consistent. This downloads each release asset, checks it against
+    # the declared digest, and compares its *content* digest with packages/<name>/ — the
+    # part that cannot be reproduced from a zip's bytes across machines.
+    #
+    # Not on pull_request: it needs the network to GitHub release assets, and a flaky
+    # weekly check must not block an unrelated contribution.
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Offline first: a digest bug makes every network result meaningless, and this
+      # half runs in a second.
+      - name: Rule self-test
+        run: python scripts/verify_release_assets.py --self-test
+      - name: Verify release assets
+        run: python scripts/verify_release_assets.py
