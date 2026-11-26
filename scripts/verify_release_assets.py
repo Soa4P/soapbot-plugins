@@ -37,7 +37,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parent.parent
 DIGEST = "sha256:"
@@ -57,11 +57,30 @@ def _load(name: str) -> dict:
     return json.loads((ROOT / name).read_text(encoding="utf-8"))
 
 
+#: Suffixes whose content is compared with line endings normalised. The published zips
+#: were built from a Windows working tree, so they carry CRLF; a Linux CI checkout of the
+#: same commit has LF. Comparing raw bytes therefore answers "was this built on the same
+#: OS", not "is this the same code" — and the first version of this check failed every
+#: plugin on Linux for exactly that reason. Binary suffixes are excluded: normalising a
+#: PNG that happens to contain 0x0D 0x0A would corrupt the comparison.
+_TEXT_SUFFIXES = frozenset(
+    {".py", ".yaml", ".yml", ".json", ".md", ".txt", ".toml", ".cfg", ".ini", ".sh"}
+)
+
+
+def _normalise_line_endings(name: str, body: bytes) -> bytes:
+    if PurePosixPath(name).suffix.lower() in _TEXT_SUFFIXES:
+        return body.replace(b"\r\n", b"\n")
+    return body
+
+
 def content_digest_from_directory(directory: Path) -> str:
     """Reproducible digest of a plugin tree: sorted ``path + sha256(file)`` pairs.
 
     ``__pycache__`` is skipped for the same reason the host skips it — the interpreter
-    rewrites it, and its contents say nothing about the reviewed source.
+    rewrites it, and its contents say nothing about the reviewed source. Line endings are
+    normalised for text files so the digest describes the code, not the machine that
+    checked it out.
     """
     pairs: list[tuple[str, str]] = []
     for path in directory.rglob("*"):
@@ -70,7 +89,9 @@ def content_digest_from_directory(directory: Path) -> str:
         relative = path.relative_to(directory)
         if "__pycache__" in relative.parts:
             continue
-        pairs.append((relative.as_posix(), hashlib.sha256(path.read_bytes()).hexdigest()))
+        name = relative.as_posix()
+        body = _normalise_line_endings(name, path.read_bytes())
+        pairs.append((name, hashlib.sha256(body).hexdigest()))
     # Keyed by the *path string*, not by ``Path`` ordering: ``Path`` comparisons are
     # case-insensitive on Windows and compare components, while the archive side sorts
     # strings. Two orderings of the same files give two digests, and the check would then
@@ -89,7 +110,8 @@ def content_digest_from_zip(payload: bytes) -> str:
             name = info.filename.replace("\\", "/")
             if "__pycache__" in name.split("/"):
                 continue
-            pairs.append((name, hashlib.sha256(archive.read(info)).hexdigest()))
+            body = _normalise_line_endings(name, archive.read(info))
+            pairs.append((name, hashlib.sha256(body).hexdigest()))
     lines = [f"{name}\0{digest}" for name, digest in sorted(pairs)]
     return "sha256:" + hashlib.sha256("\n".join(lines).encode("utf-8")).hexdigest()
 

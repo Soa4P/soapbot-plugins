@@ -98,10 +98,20 @@ def main() -> int:
     dist = ROOT / ".release"
     dist.mkdir(exist_ok=True)
     zip_path = dist / f"{name}-{new_version}.zip"
+    # Written through ``writestr`` with normalised line endings rather than ``write``:
+    # a zip built on a Windows checkout used to carry CRLF while the repository stores LF,
+    # so "is the release the code in git" was unanswerable across platforms
+    # (scripts/verify_release_assets.py hit exactly that). Archives from now on are
+    # LF-only and byte-stable regardless of where they were built.
+    _TEXT_SUFFIXES = {".py", ".yaml", ".yml", ".json", ".md", ".txt", ".toml", ".cfg", ".ini", ".sh"}
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
         for path in sorted((ROOT / "packages" / name).rglob("*")):
-            if path.is_file() and "__pycache__" not in path.parts:
-                zf.write(path, path.relative_to(ROOT / "packages" / name).as_posix())
+            if not path.is_file() or "__pycache__" in path.parts:
+                continue
+            body = path.read_bytes()
+            if path.suffix.lower() in _TEXT_SUFFIXES:
+                body = body.replace(b"\r\n", b"\n")
+            zf.writestr(path.relative_to(ROOT / "packages" / name).as_posix(), body)
     digest = hashlib.sha256(zip_path.read_bytes()).hexdigest()
     print(f"zip: {zip_path.name} sha256={digest}")
 
