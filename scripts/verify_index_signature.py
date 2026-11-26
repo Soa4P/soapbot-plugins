@@ -31,7 +31,7 @@ PUBLIC_KEY_B64 = "N558xgdHlVRPqUY9Z9A9WtVUbGPAJBhqr1Nkqamuy1E="
 KEY_ID = "c74ba4090e4ea9ca"
 ALGORITHM = "ed25519"
 SIGNATURE_FILENAME = "index.sig.json"
-COVERED = ("plugins.json", "plugin_versions.json")
+COVERED = ("plugins.json", "plugin_versions.json", "archived_plugins.json")
 
 
 def canonical_payload(covers: dict[str, str]) -> bytes:
