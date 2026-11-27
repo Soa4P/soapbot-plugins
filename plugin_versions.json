@@ -490,6 +490,15 @@
         "min_host_version": "0.1.0",
         "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/group-digest-0.1.1/group-digest-0.1.1.zip"
       }
+    ],
+    "bili-card": [
+      {
+        "version": "0.1.0",
+        "released_at": "2026-11-27",
+        "digest": "sha256:81e086513d5a20a2c87fd6c885de58916f016c3c4f47829e7420d05bc8c07d99",
+        "min_host_version": "0.1.0",
+        "download": "https://github.com/Soa4P/soapbot-plugins/releases/download/bili-card-0.1.0/bili-card-0.1.0.zip"
+      }
     ]
   },
   "updated_at": "2026-11-16"

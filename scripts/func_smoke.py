@@ -43,8 +43,13 @@ PLAN: dict[str, list[tuple[str, list[str]]]] = {
     "mood-diary": [("mood-on", []), ("mood", []), ("mood-forget", [])],
 }
 
-# 有消息钩子的包：功能冒烟顺带真发一条，钩子里的 storage 写也要活着。
-HOOKS_TO_FIRE = {"auto-chat"}
+# 有消息钩子的包：功能冒烟顺带真发消息，钩子的 storage 读写要活着。值是该包的
+# 测试消息（缺省一条普通文本）。钩子-only 的包（无命令）也要进这里——冒烟是它
+# 唯一被真驱动的路径。
+HOOKS_TO_FIRE: dict[str, list[str]] = {
+    "auto-chat": ["这是一条测试消息"],
+    "bili-card": ["看看这个 https://b23.tv/abc123"],
+}
 
 # 必须声明 min_role=ADMIN 的命令（S-SUP-06）：改全局配置、开关群级行为、写外部
 # 账号、清空跨会话共享数据。插件命令默认 MEMBER——不显式收紧就是任何群成员可调。
@@ -96,7 +101,7 @@ async def run_package(name: str, temp: str, fails: list[str]) -> None:
             print(f"[{'ok  ' if ok else 'FAIL'}] {name} /{cmd} min_role={declared or '(member)'}")
             if not ok:
                 fails.append(f"{name}/{cmd}/min_role")
-        for cmd, args in PLAN[name]:
+        for cmd, args in PLAN.get(name, ()):
             try:
                 out = await loaded.worker.invoke(cmd, caller=_caller(), args=args)
                 text = str(out)
@@ -109,12 +114,13 @@ async def run_package(name: str, temp: str, fails: list[str]) -> None:
                 fails.append(f"{name}/{cmd}")
         if name in HOOKS_TO_FIRE:
             for hook in getattr(loaded.context, "_message_hooks", []):
-                try:
-                    await hook(_caller(), "这是一条测试消息")
-                    print(f"[ok  ] {name} hook {hook.__name__} fired")
-                except Exception as exc:
-                    print(f"[FAIL] {name} hook -> {type(exc).__name__}: {exc}")
-                    fails.append(f"{name}/hook")
+                for message in HOOKS_TO_FIRE[name]:
+                    try:
+                        await hook(_caller(), message)
+                        print(f"[ok  ] {name} hook {hook.__name__} fired")
+                    except Exception as exc:
+                        print(f"[FAIL] {name} hook -> {type(exc).__name__}: {exc}")
+                        fails.append(f"{name}/hook")
     finally:
         await loader.supervisor.stop_all()
 
@@ -124,10 +130,12 @@ async def main() -> int:
     parser.add_argument("--plugins", default="", help="逗号分隔；空 = 全部有 PLAN 条目的包")
     args = parser.parse_args()
 
-    wanted = [s.strip() for s in args.plugins.split(",") if s.strip()] or sorted(PLAN)
+    wanted = [s.strip() for s in args.plugins.split(",") if s.strip()] or sorted(
+        set(PLAN) | set(HOOKS_TO_FIRE)
+    )
     fails: list[str] = []
     for name in wanted:
-        if name not in PLAN:
+        if name not in PLAN and name not in HOOKS_TO_FIRE:
             print(f"[skip] {name}: 无 PLAN 条目（请在 scripts/func_smoke.py 登记）")
             continue
         if not (PACKAGES / name).is_dir():

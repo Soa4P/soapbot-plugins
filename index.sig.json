@@ -2,10 +2,10 @@
   "algorithm": "ed25519",
   "covers": {
     "archived_plugins.json": "sha256:3e9f5fdc9513791c3912e6ccd205e8de10c5a13ac5d6ccfd0a7b1f8e87251160",
-    "plugin_versions.json": "sha256:b8c545d04af86fbc3dc7f89d9e258a555ad36de89637e74d51d957be64d7ccbc",
-    "plugins.json": "sha256:354fdaba2baecdff4fcfd7448927c89514ce4e80a4b424e8488872bca3ce2d6a"
+    "plugin_versions.json": "sha256:0df9b3bfd57e650f21b16bcca28630b0560f0e76f6710995cfb145a7b1d3e8e7",
+    "plugins.json": "sha256:15773cd0a88fe227cabdb20dd14187ddc71a6f77b7d756c20bfc9b7e28cc2735"
   },
   "key_id": "c74ba4090e4ea9ca",
-  "signature": "6nN8Ey1Tsa2uxAqUwJXlotyaTEI0ZgTXlmwqzo9cQm4OAVsBDmwvkGEdZSlYD0oSO7QXJUUjk67GG0BnRfZoCA==",
+  "signature": "0GWDwu7MrnNwsqsfLf7o282X+pbVx+qI1zDiwsNekW91tDAS0XUQ3UwNC8Agi+jpKk17RMsJgFXmVK5U6CrmCQ==",
   "version": 1
 }
