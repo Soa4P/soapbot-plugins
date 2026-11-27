@@ -186,6 +186,17 @@
       "author": "soapbot-plugins",
       "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/group-digest",
       "repository": "https://github.com/Soa4P/soapbot-plugins"
+    },
+    {
+      "name": "bili-card",
+      "latest": "0.1.0",
+      "versions": [
+        "0.1.0"
+      ],
+      "summary": "B 站链接信息卡（被动）",
+      "author": "soapbot-plugins",
+      "homepage": "https://github.com/Soa4P/soapbot-plugins/tree/main/packages/bili-card",
+      "repository": "https://github.com/Soa4P/soapbot-plugins"
     }
   ]
 }

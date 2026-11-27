@@ -162,6 +162,18 @@
       ],
       "requires": [],
       "readme": "packages/group-digest/README.md"
+    },
+    "bili-card": {
+      "summary": "B 站链接信息卡（被动）",
+      "description": "群里有人贴 B 站链接时回一张确定性信息卡——标题、UP 主、时长、公开数据、原链。改编自 AstrBot 市场链接解析插件的机制，按本仓边界收窄：目标解析、限流与字段白名单全在宿主 bilibili.view surface 完成，插件只发目标只拿净化字段，无封面无播放地址；会话级 TTL 去重加每分钟上限，同一链接半小时只卡一次。无模型调用，失败静默（失败不是事件）。",
+      "capabilities": [
+        "message",
+        "send",
+        "bilibili",
+        "storage"
+      ],
+      "requires": [],
+      "readme": "packages/bili-card/README.md"
     }
   }
 }
